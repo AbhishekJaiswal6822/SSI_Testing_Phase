@@ -10,7 +10,7 @@ export async function api(path, { method = "GET", body, token } = {}) {
     if (token) headers.Authorization = `Bearer ${token}`;
 
     // CRITICAL FIX: fullUrl is declared correctly
-    const fullUrl = `${API_BASE}${path}`; 
+    const fullUrl = `${API_BASE_URL}${path}`;
     
     console.log(`[FRONTEND SENDING]: ${method} request to ${fullUrl}`);
 
