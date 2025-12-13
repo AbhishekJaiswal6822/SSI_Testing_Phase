@@ -1,7 +1,9 @@
 // frontend/src/api.js
 
 // FIXED: API_BASE fallback port is now 8000
-const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:5173";
+// const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:5173";
+const API_BASE_URL = "https://ssi-testing-phase.onrender.com";
+
 
 export async function api(path, { method = "GET", body, token } = {}) {
     const headers = { "Content-Type": "application/json" };
