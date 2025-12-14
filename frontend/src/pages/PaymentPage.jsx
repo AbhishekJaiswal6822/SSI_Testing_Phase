@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { api } from "../api";
 
 function PaymentPage() {
   const location = useLocation();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
-  // ✅ Safe destructuring with defaults
+  // ✅ Safe destructuring
   const {
     amount = 0,
     raceCategory = "",
@@ -14,7 +15,7 @@ function PaymentPage() {
     groupName = "",
   } = location.state || {};
 
-  // ❌ Block direct URL access
+  // ❌ Block direct access
   if (!location.state || amount <= 0) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -25,60 +26,49 @@ function PaymentPage() {
     );
   }
 
-  // ✅ Razorpay handler
   const handlePayment = async () => {
-    if (loading) return; // prevent double click
+    if (loading) return;
     setLoading(true);
 
-    console.log("Creating order for amount:", amount); // 🔍 DEBUG LOG
-
     try {
+      console.log("Creating order for amount:", amount);
+
       // 1️⃣ Create order from backend
-      const res = await fetch(
-        "http://localhost:8000/api/payment/create-order",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ amount }),
-        }
-      );
+      const response = await api("/api/payment/create-order", {
+        method: "POST",
+        body: { amount },
+      });
 
-      if (!res.ok) {
-        throw new Error("Failed to create order");
+      console.log("Backend response:", response);
+
+      const { key, order } = response;
+
+      // 2️⃣ Validate response properly
+      if (!key || !order || !order.id || !order.amount) {
+        throw new Error("Invalid order response from backend");
       }
 
-      const order = await res.json();
-
-      // 2️⃣ Validate backend response
-      if (!order?.id || !order?.amount) {
-        throw new Error("Invalid order response");
-      }
-
-      // 3️⃣ Ensure Razorpay SDK is loaded
+      // 3️⃣ Ensure Razorpay SDK exists
       if (!window.Razorpay) {
-        alert("Payment service not loaded. Please refresh the page.");
+        alert("Razorpay SDK not loaded. Please refresh.");
         return;
       }
 
-      // 4️⃣ Razorpay options
+      // 4️⃣ Razorpay options (TEST MODE)
       const options = {
-        key: import.meta.env.VITE_RAZORPAY_KEY, // ✅ ENV-based key
-        amount: order.amount, // amount in paise
+        key, // ✅ backend test key
+        amount: order.amount, // paise
         currency: "INR",
         name: "Sprints Saga India",
         description: "Marathon Registration",
         order_id: order.id,
-        handler: function (response) {
-          console.log("Payment Success:", response);
-          alert("Payment Successful!");
+        handler: function (res) {
+          console.log("Payment success:", res);
+          alert("Payment Successful (Test Mode)");
 
-          // 🔜 NEXT STEP (future)
+          // 🔜 Later:
           // verify payment on backend
           // navigate("/payment-success");
-        },
-        prefill: {
-          email: "", // optional
-          contact: "", // optional
         },
         theme: {
           color: "#0d9488",
@@ -132,7 +122,6 @@ function PaymentPage() {
           </div>
         </div>
 
-        {/* ✅ Payment Button */}
         <button
           className={`mt-8 w-full rounded-full py-3 text-white font-semibold transition ${
             loading
