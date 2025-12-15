@@ -8,6 +8,7 @@ import { CiMenuBurger } from "react-icons/ci";
 import { AiOutlineClose } from "react-icons/ai";
 import { Link, useLocation } from "react-router-dom";
 import logo from "./assets/logo.jpg";
+import logobg from './assets/logo-Picsart-BackgroundRemover.jpg'
 
 function Navbar() {
   const [open, setOpen] = useState(false);
@@ -47,7 +48,8 @@ function Navbar() {
           {/* Logo */}
           <Link to="/" onClick={closeMenu} className="shrink-0">
             <img
-              src={logo}
+            // src={logo}
+              src={logobg}
               alt="Sprints Saga India"
               className="h-14 w-auto object-contain"
               draggable={false}
@@ -87,7 +89,7 @@ function Navbar() {
                 to="/signin"
                 className="px-4 py-1.5 rounded-lg border text-sm"
               >
-                Sign In
+                Login
               </Link>
               <Link
                 to="/signup"
@@ -110,7 +112,7 @@ function Navbar() {
       </div>
 
       {/* Mobile menu */}
-      {open && (
+      {/* {open && (
         <div className="lg:hidden border-t bg-white">
           <ul className="px-4 py-4 space-y-2">
             {links.map(({ key, label, to }) => (
@@ -126,7 +128,56 @@ function Navbar() {
             ))}
           </ul>
         </div>
-      )}
+      )} */}
+      {/* Mobile menu */}
+{open && (
+  <div className="lg:hidden border-t bg-white">
+    <ul className="px-4 py-4 space-y-2">
+
+      {/* Navigation links */}
+      {links.map(({ key, label, to }) => (
+        <li key={key}>
+          <Link
+            to={to}
+            onClick={closeMenu}
+            className="block px-3 py-2 rounded-md hover:bg-slate-100"
+          >
+            {label}
+          </Link>
+        </li>
+      ))}
+
+      {/* Divider */}
+      <li className="pt-3">
+        <hr />
+      </li>
+
+      {/* ✅ Auth buttons (mobile only) */}
+      <li>
+        <Link
+          to="/signin"
+          onClick={closeMenu}
+          className="block text-center px-4 py-2 rounded-lg border text-slate-700"
+        >
+          Sign In
+        </Link>
+      </li>
+
+      <li>
+        <Link
+          to="/signup"
+          onClick={closeMenu}
+          className="block text-center px-4 py-2 rounded-lg text-white"
+          style={{ background: "linear-gradient(90deg,#05c6d7,#0c9aa3)" }}
+        >
+          Sign Up
+        </Link>
+      </li>
+
+    </ul>
+  </div>
+)}
+
     </header>
   );
 }

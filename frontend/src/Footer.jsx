@@ -42,9 +42,9 @@ function Footer() {
               {/* Email Us */}
               <div className="min-w-0">
                 <h5 className="text-white font-medium mb-1">Email Us</h5>
-                <p className="text-slate-300 text-sm wrap-break-word whitespace-normal">info.sprintssagaindia@gmail.com</p>
-                <p className="text-slate-300 text-sm wrap-break-word whitespace-normal">support@sprintssagaindia.com</p>
-                <p className="text-slate-300 text-sm wrap-break-word whitespace-normal">events@sprintssagaindia.com</p>
+                <p className="text-slate-300 text-sm wrap-break-word whitespace-normal">info.desk@sprintssagaindia.com</p>
+                <h1  className="text-white font-medium mb-1">Bulk Registration</h1>
+                <p className="text-slate-300 text-sm wrap-break-word whitespace-normal">registration@sprintssagaindia.com</p>
               </div>
 
               {/* Social */}
@@ -60,8 +60,10 @@ function Footer() {
               {/* Phone */}
               <div className="shrink-0">
                 <h5 className="text-white font-medium mb-1">Contact Number</h5>
-                <p className="text-slate-300 text-sm">+91 9987190415</p>
-                <p className="text-slate-300 text-sm">+91 9967707306</p>
+                <p className="text-slate-300 text-sm">Mobile Number: +91 8850943813</p>
+                <p className="text-slate-300 text-sm">Mobile Number: +91 9967707306</p>
+                <p className="text-slate-300 text-sm">WhatsApp: +91 9987190415</p>
+                
               </div>
 
             </div>

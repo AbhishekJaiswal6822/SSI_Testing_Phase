@@ -41,7 +41,7 @@ export default function EventOverview() {
             Event Information
           </h2>
           <p className="text-slate-500 mt-1">
-            Everything you need to know about Marathon Run 2026
+            Everything you need to know about LokRaja Marathon - Chapter Pune 2026
           </p>
         </div>
 

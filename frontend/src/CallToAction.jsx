@@ -26,7 +26,7 @@ function CallToAction() {
 
         {/* Subtitle */}
         <p className="text-lg sm:text-xl leading-relaxed mb-10">
-          Don't miss out on the most exciting marathon event of 2026.
+          Don't miss out on the most exciting LokRaja Marathon event  2026.
           Register now <br /> and secure your spot!
         </p>
 

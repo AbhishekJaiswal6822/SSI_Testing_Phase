@@ -16,7 +16,7 @@ function ResultsGallery() {
   return (
     <main className="min-h-screen bg-slate-50 pb-20">
       {/* Header */}
-      <section className="text-center py-12">
+      <section className="text-center py-12 mt-10">
         <h1 className="text-4xl font-extrabold text-teal-700 mb-3">
           Race Results & Gallery
         </h1>
@@ -55,7 +55,7 @@ function ResultsGallery() {
         </div>
 
         {/* TOP PERFORMERS */}
-        <div className="bg-white p-8 rounded-3xl shadow-sm border border-slate-200">
+        {/* <div className="bg-white p-8 rounded-3xl shadow-sm border border-slate-200">
           <div className="flex items-center gap-2 mb-1">
             <span className="text-xl text-teal-600">🏅</span>
             <h2 className="text-xl font-semibold text-slate-900">Top Performers</h2>
@@ -92,20 +92,20 @@ function ResultsGallery() {
               </div>
             ))}
           </div>
-        </div>
+        </div> */}
 
         {/* PHOTO GALLERY */}
-        <div className="bg-white p-8 rounded-3xl shadow-sm border border-slate-200">
-          <div className="flex items-center gap-2 mb-1">
+        {/* <div className="bg-white p-8 rounded-3xl shadow-sm border border-slate-200"> */}
+          {/* <div className="flex items-center gap-2 mb-1">
             <FiCamera className="text-teal-600 text-xl" />
             <h2 className="text-xl font-semibold text-slate-900">Race Photo Gallery</h2>
           </div>
           <p className="text-slate-500 mb-6">
             Professional race photos available for download
-          </p>
+          </p> */}
 
           {/* Photo Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {/* <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {galleryItems.map((_, idx) => (
               <div
                 key={idx}
@@ -114,18 +114,18 @@ function ResultsGallery() {
                 <FiCamera className="text-slate-400 text-3xl" />
               </div>
             ))}
-          </div>
+          </div> */}
 
           {/* View All Photos Button */}
-          <div className="mt-8 text-center">
+          {/* <div className="mt-8 text-center">
             <button className="px-6 py-3 rounded-xl border border-slate-300 text-slate-700 font-semibold 
                     bg-white hover:bg-slate-100">
               View All Photos
             </button>
-          </div>
+          </div> */}
         </div>
 
-      </div>
+      {/* </div> */}
     </main>
   );
 }

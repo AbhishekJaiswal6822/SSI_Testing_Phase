@@ -13,7 +13,7 @@ function EventInformation() {
 
           {/* Subtitle */}
           <p className="text-slate-500 mt-2 mb-12 text-lg">
-            Everything you need to know about Marathon Run 2024
+            Everything you need to know about LokRaja Marathon - Chapter Pune 2026
           </p>
 
           {/* 4 Cards */}

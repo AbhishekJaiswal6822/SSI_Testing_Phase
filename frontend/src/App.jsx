@@ -1,12 +1,117 @@
+// // C:\Users\abhis\OneDrive\Desktop\SOFTWARE_DEVELOPER_LEARNING\marathon_project\frontend\src\App.jsx
+
+// import React from "react";
+// import { BrowserRouter, Routes, Route } from "react-router-dom";
+
+// // Imports for  and Payment
+
+// import PaymentPage from "./pages/PaymentPage"; // Already imported
+
+// // Imports for Auth and Protection
+// import { AuthProvider } from "./AuthProvider";
+// import ProtectedRoute from "./ProtectedRoute";
+
+// import Navbar from "./Navbar";
+// import Footer from "./Footer";
+
+// // Pages
+// import Home from "./Home";
+// // Removed: import Register from "./Register"; // This is now RegistrationForm
+// import SignIn from "./SignIn";
+// import SignUp from "./SignUp";
+// import ResultsGallery from "./ResultsGallery";
+// import AdminDashboard from "./AdminDashboard";
+// import Accomodation from "./Accomodation";
+// import AdminAccommodation from "./AdminAccommodation";
+// import UnderMaintenance from "./UnderMaintenance";
+// import Faqs from "./Faqs";
+// import PrivacyPolicy from "./PrivacyPolicy";
+
+// // Utilities
+// import ScrollToTop from "./ScrollToTop";
+// import Register from "./Register";
+
+// import PaymentSuccessPage from './pages/PaymentSuccessPage';
+
+// function App() {
+//     return (
+//         <BrowserRouter>
+//             <ScrollToTop />
+
+//             {/* AuthProvider must wrap all components that useAuth() */}
+//             <AuthProvider>
+
+//                 <div className="min-h-screen flex flex-col">
+
+//                     <Navbar />
+
+//                     <main className="flex-1">
+//                         <Routes>
+//                             <Route path="/" element={<Home />} />
+
+//                             {/* --- MARATHON REGISTRATION FORM (Protected) --- */}
+//                             <Route
+//                                 path="/register"
+//                                 element={<ProtectedRoute><Register /></ProtectedRoute>}
+//                             />
+
+//                             {/* --- PAYMENT PAGE (Protected) --- */}
+//                             <Route
+//                                 path="/payment"
+//                                 element={<ProtectedRoute><PaymentPage /></ProtectedRoute>}
+//                             />
+
+//                             {/* --- PUBLIC ROUTES --- */}
+//                             <Route path="/signin" element={<SignIn />} />
+//                             <Route path="/signup" element={<SignUp />} />
+//                             <Route path="/results" element={<ResultsGallery />} />
+//                             <Route path="/admin" element={<AdminDashboard />} />
+//                             <Route path="/accommodation" element={<Accomodation />} />
+//                             <Route
+//                                 path="/admin/accommodation"
+//                                 element={<AdminAccommodation />}
+//                             />
+//                             <Route path="/community" element={<UnderMaintenance />} />
+//                             <Route path="/expo" element={<UnderMaintenance />} />
+//                             <Route path="/raceday" element={<UnderMaintenance />} />
+//                             <Route path="/dashboard" element={<UnderMaintenance />} />
+//                             <Route path="/faqs" element={<Faqs />} />
+//                             <Route path="/privacy&policies" element={<PrivacyPolicy />} />
+//                             <Route path="/payment-success" element={<PaymentSuccessPage />} />
+//                         </Routes>
+//                     </main>
+
+//                     <Footer />
+
+//                 </div>
+
+//             </AuthProvider>
+//         </BrowserRouter>
+//     );
+// }
+
+// export default App;
+
+
+// C:\Users\abhis\OneDrive\Desktop\SOFTWARE_DEVELOPER_LEARNING\marathon_project\frontend\src\App.jsx - UPDATED
+
+// C:\Users\abhis\OneDrive\Desktop\SOFTWARE_DEVELOPER_LEARNING\marathon_project\frontend\src\App.jsx - UPDATED
+
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+
+// Imports for and Payment
+import PaymentPage from "./pages/PaymentPage"; 
+
+// Imports for Auth and Protection
+import { AuthProvider } from "./AuthProvider";
+import ProtectedRoute from "./ProtectedRoute"; // CRITICAL
 
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 
 // Pages
 import Home from "./Home";
-import Register from "./Register";
 import SignIn from "./SignIn";
 import SignUp from "./SignUp";
 import ResultsGallery from "./ResultsGallery";
@@ -16,61 +121,78 @@ import AdminAccommodation from "./AdminAccommodation";
 import UnderMaintenance from "./UnderMaintenance";
 import Faqs from "./Faqs";
 import PrivacyPolicy from "./PrivacyPolicy";
-import PaymentPage from "./pages/PaymentPage";
 
 // Utilities
 import ScrollToTop from "./ScrollToTop";
+import Register from "./Register";
+import PaymentSuccessPage from './pages/PaymentSuccessPage';
 
 function App() {
-  return (
-    <BrowserRouter>
-      <ScrollToTop />
+    return (
+        <BrowserRouter>
+            <ScrollToTop />
 
-      {/* ROOT WRAPPER (STEP 3 FIX) */}
-      <div className="min-h-screen flex flex-col">
+            {/* AuthProvider must wrap all components that useAuth() */}
+            <AuthProvider>
 
-        {/* Navbar */}
-        <Navbar />
+                <div className="min-h-screen flex flex-col">
 
-        {/* Main content */}
-        <main className="flex-1">
-          <Routes>
-            <Route path="/" element={<Home />} />
+                    <Navbar />
 
-            <Route path="/register" element={<Register />} />
-            <Route path="/signin" element={<SignIn />} />
-            <Route path="/signup" element={<SignUp />} />
+                    <main className="flex-1">
+                        <Routes>
+                            <Route path="/" element={<Home />} />
 
-            <Route path="/results" element={<ResultsGallery />} />
+                            {/* --- PROTECTED ROUTES (Requiring only LOGIN) --- */}
+                            <Route
+                                path="/register"
+                                element={<ProtectedRoute><Register /></ProtectedRoute>}
+                            />
+                            <Route
+                                path="/payment"
+                                element={<ProtectedRoute><PaymentPage /></ProtectedRoute>}
+                            />
+                            
+                            {/* --- RBAC ROUTES (Requiring ADMIN ROLE) --- */}
+                            <Route
+                                path="/admin"
+                                element={
+                                    <ProtectedRoute requiredRole="admin">
+                                        <AdminDashboard />
+                                    </ProtectedRoute>
+                                }
+                            />
+                            <Route
+                                path="/admin/accommodation"
+                                element={
+                                    <ProtectedRoute requiredRole="admin">
+                                        <AdminAccommodation />
+                                    </ProtectedRoute>
+                                }
+                            />
 
-            <Route path="/admin" element={<AdminDashboard />} />
-            <Route path="/accommodation" element={<Accomodation />} />
-            <Route
-              path="/admin/accommodation"
-              element={<AdminAccommodation />}
-            />
+                            {/* --- PUBLIC ROUTES --- */}
+                            <Route path="/signin" element={<SignIn />} />
+                            <Route path="/signup" element={<SignUp />} />
+                            <Route path="/results" element={<ResultsGallery />} />
+                            <Route path="/accommodation" element={<Accomodation />} />
+                            <Route path="/community" element={<UnderMaintenance />} />
+                            <Route path="/expo" element={<UnderMaintenance />} />
+                            <Route path="/raceday" element={<UnderMaintenance />} />
+                            <Route path="/dashboard" element={<UnderMaintenance />} />
+                            <Route path="/faqs" element={<Faqs />} />
+                            <Route path="/privacy&policies" element={<PrivacyPolicy />} />
+                            <Route path="/payment-success" element={<PaymentSuccessPage />} />
+                        </Routes>
+                    </main>
 
-            <Route path="/community" element={<UnderMaintenance />} />
-            <Route path="/expo" element={<UnderMaintenance />} />
-            <Route path="/raceday" element={<UnderMaintenance />} />
-            <Route path="/dashboard" element={<UnderMaintenance />} />
+                    <Footer />
 
-            <Route path="/faqs" element={<Faqs />} />
-            <Route path="/privacy&policies" element={<PrivacyPolicy />} />
+                </div>
 
-             {/* Payment Page */}
-            {/* <Route path="/payment" element={<PaymentPage />} /> */}
-            <Route path="/payment" element={<PaymentPage />} />
-
-          </Routes>
-        </main>
-
-        {/* Footer */}
-        <Footer />
-
-      </div>
-    </BrowserRouter>
-  );
+            </AuthProvider>
+        </BrowserRouter>
+    );
 }
 
 export default App;

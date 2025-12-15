@@ -36,7 +36,7 @@ function UnderMaintenance() {
 
         {/* Footer note */}
         <p className="text-xs text-slate-400 mt-6">
-          © {new Date().getFullYear()} Marathon Run — All rights reserved.
+          © {new Date().getFullYear()} Sprints Saga India — All rights reserved.
         </p>
       </div>
     </main>

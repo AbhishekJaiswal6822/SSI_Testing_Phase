@@ -62,7 +62,7 @@ function Accomodation() {
           >
             <div className="rounded-2xl bg-cyan-50 border border-cyan-100 p-4 text-sm text-slate-700">
               <p className="font-semibold text-teal-800 mb-1">
-                Staying with Marathon Run Partner Hotels
+                Staying with Sprints Saga India Partner Hotels
               </p>
               <p>
                 Limited rooms are available at partner hotels close to the

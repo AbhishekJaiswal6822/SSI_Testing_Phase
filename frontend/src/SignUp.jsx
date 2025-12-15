@@ -1,7 +1,12 @@
+
+
+
 // src/SignUp.jsx
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "./AuthProvider";
+// ADDED: Import icons for password visibility toggle
+import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 
 function SignUp() {
   const { register } = useAuth();
@@ -13,11 +18,28 @@ function SignUp() {
   const [phone, setPhone] = useState("");
   const [err, setErr] = useState("");
   const [loading, setLoading] = useState(false);
+  // ADDED: State to manage password visibility
+  const [showPassword, setShowPassword] = useState(false); 
+  // ADDED: Correct state for the Confirm Password field
+  const [confirmPassword, setConfirmPassword] = useState("");
+
+  // ADDED: Toggle function
+  const togglePasswordVisibility = () => {
+    setShowPassword((prev) => !prev);
+  };
+
 
   const submit = async (e) => {
     e.preventDefault();
     setErr("");
     setLoading(true);
+
+    // CRITICAL FUNCTIONALITY CHECK: Compare passwords
+    if (password !== confirmPassword) {
+        setErr("Passwords do not match.");
+        setLoading(false);
+        return;
+    }
 
     try {
       await register(name, email, password, phone);
@@ -31,87 +53,142 @@ function SignUp() {
 
   return (
 
-    <div className="min-h-screen lg:h-screen bg-gray-50 flex items-center justify-center px-4 py-12 mt-12">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-12 mt-12">
       <form
         onSubmit={submit}
-        className="w-full max-w-md bg-white rounded-xl shadow-lg p-8 border border-slate-200 relative z-10"
+        className="w-full max-w-md bg-white rounded-xl shadow-2xl p-8 border border-slate-100 relative z-10"
       >
-        <h2 className="text-2xl font-bold text-slate-800 mb-2">
-          Create an Account
+        <h2 className="text-3xl font-extrabold text-teal-700 mb-2">
+          Create Account
         </h2>
-        <p className="text-slate-500 mb-6">
-          Join the Marathon Run community and register for the event.
+        <p className="text-slate-500 mb-8 text-sm">
+          Register now and be part of the LokRaja Marathon running community.
         </p>
 
+        {/* Full Name */}
         <label className="block text-sm font-medium text-slate-700 mb-1">
-          Full Name
+          Full Name *
         </label>
         <input
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="John Doe"
-          className="w-full px-3 py-2 border border-slate-300 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-teal-300 focus:border-transparent"
+          className="w-full px-4 py-2 border border-slate-300 rounded-lg mb-4 shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
           required
         />
 
+        {/* Email Address */}
         <label className="block text-sm font-medium text-slate-700 mb-1">
-          Email Address
+          Email Address *
         </label>
         <input
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="john@example.com"
-          className="w-full px-3 py-2 border border-slate-300 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-teal-300 focus:border-transparent"
+          className="w-full px-4 py-2 border border-slate-300 rounded-lg mb-4 shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
           required
         />
 
+        {/* Phone Number */}
         <label className="block text-sm font-medium text-slate-700 mb-1">
-          Phone Number (optional)
+          Phone Number *
         </label>
         <input
-          type="text"
+          type="tel" // Changed to type="tel" for semantic clarity
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
           placeholder="1234567890"
-          className="w-full px-3 py-2 border border-slate-300 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-teal-300 focus:border-transparent"
+          className="w-full px-4 py-2 border border-slate-300 rounded-lg mb-4 shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+          required 
         />
 
+        {/* Password Input */}
         <label className="block text-sm font-medium text-slate-700 mb-1">
-          Password
+          Password *
         </label>
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Enter a password"
-          className="w-full px-3 py-2 border border-slate-300 rounded-lg mb-6 focus:outline-none focus:ring-2 focus:ring-teal-300 focus:border-transparent"
-          required
-        />
+        <div className="relative mb-4">
+            <input
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Enter a password"
+                className="w-full px-4 py-2 border border-slate-300 rounded-lg pr-10 shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                required
+            />
+            <button
+                type="button"
+                onClick={togglePasswordVisibility}
+                className="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-500 hover:text-teal-700"
+                aria-label={showPassword ? "Hide password" : "Show password"}
+            >
+                {showPassword ? (
+                    <AiOutlineEyeInvisible className="h-5 w-5" />
+                ) : (
+                    <AiOutlineEye className="h-5 w-5" />
+                )}
+            </button>
+        </div>
 
-        {err && <p className="text-red-500 text-sm mb-3">{err}</p>}
 
+        {/* Confirm Password Input */}
+        <label className="block text-sm font-medium text-slate-700 mb-1">
+          Confirm Password *
+        </label>
+        <div className="relative mb-6">
+            <input
+                type={showPassword ? "text" : "password"}
+                value={confirmPassword} 
+                onChange={(e) => setConfirmPassword(e.target.value)} 
+                placeholder="Re-enter password"
+                className="w-full px-4 py-2 border border-slate-300 rounded-lg pr-10 shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                required
+            />
+            {/* Note: We keep the visibility toggle here for consistency, though it controls both */}
+            <button
+                type="button"
+                onClick={togglePasswordVisibility}
+                className="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-500 hover:text-teal-700"
+                aria-label={showPassword ? "Hide password" : "Show password"}
+            >
+                {showPassword ? (
+                    <AiOutlineEyeInvisible className="h-5 w-5" />
+                ) : (
+                    <AiOutlineEye className="h-5 w-5" />
+                )}
+            </button>
+        </div>
+
+        {/* Error Message */}
+        {err && (
+            <div className="bg-red-50 p-3 rounded-lg border border-red-300 mb-4">
+                <p className="text-red-700 text-sm font-medium">{err}</p>
+            </div>
+        )}
+
+        {/* Submit Button */}
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-3 rounded-lg text-white font-semibold cursor-pointer shadow-md hover:opacity-95"
-          style={{ background: "linear-gradient(90deg,#05c6d7,#0c9aa3)" }}
+          className={`w-full py-3 rounded-xl text-white font-semibold shadow-lg transition duration-200 
+                ${loading ? 'opacity-70 cursor-not-allowed bg-teal-500' : 'hover:shadow-teal-400/50 hover:opacity-90'}`}
+          style={{ background: "linear-gradient(90deg, #06b6d4, #14b8a6)" }}
         >
           {loading ? "Creating Account..." : "Create Account"}
         </button>
 
-        <div className="text-center mt-6 text-sm">
-          Already have an account?{" "}
-          <Link to="/signin" className="text-teal-600 font-medium">
-            Sign in here
-          </Link>
-        </div>
-
-        <div className="text-center mt-3 text-sm">
-          <Link to="/" className="text-teal-500">
-            Back to Home
-          </Link>
+        {/* Links */}
+        <div className="text-center mt-6 text-sm space-y-2">
+          <p>
+                Already have an account?{" "}
+              <Link to="/signin" className="text-teal-600 font-bold hover:underline">
+                Sign in here
+              </Link>
+            </p>
+              <Link to="/" className="text-slate-500 hover:text-teal-600 font-medium transition duration-150">
+                ← Back to Home
+              </Link>
         </div>
       </form>
     </div>
