@@ -95,8 +95,6 @@
 
 // C:\Users\abhis\OneDrive\Desktop\SOFTWARE_DEVELOPER_LEARNING\marathon_project\frontend\src\App.jsx - UPDATED
 
-// C:\Users\abhis\OneDrive\Desktop\SOFTWARE_DEVELOPER_LEARNING\marathon_project\frontend\src\App.jsx - UPDATED
-
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 

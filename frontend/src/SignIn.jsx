@@ -1,6 +1,11 @@
+
+
+
 // // src/SignIn.jsx
 // import React, { useState } from "react";
 // import { Link, useNavigate } from "react-router-dom";
+// // Assuming you have a library like react-icons installed
+// import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai"; 
 // import { useAuth } from "./AuthProvider";
 
 // function SignIn() {
@@ -11,16 +16,25 @@
 //   const [password, setPassword] = useState("");
 //   const [err, setErr] = useState("");
 //   const [loading, setLoading] = useState(false);
+//   // NEW STATE: To manage password visibility
+//   const [showPassword, setShowPassword] = useState(false); 
+
+//   const togglePasswordVisibility = () => {
+//     setShowPassword((prev) => !prev);
+//   };
 
 //   const submit = async (e) => {
 //     e.preventDefault();
 //     setErr("");
 //     setLoading(true);
 //     try {
+//       // NOTE: Your navigation destination was root ('/') previously, 
+//       // but typically after sign-in, you might go to a dashboard or profile.
 //       await login(email, password);
 //       navigate("/");
 //     } catch (error) {
-//       setErr(error.message || "Login failed");
+//       // Catch specific Firebase/Auth error messages if possible
+//       setErr(error.message || "Login failed. Please check your credentials.");
 //     } finally {
 //       setLoading(false);
 //     }
@@ -35,21 +49,7 @@
 //         <h2 className="text-2xl font-bold text-slate-800 mb-2">Login</h2>
 //         <p className="text-slate-500 mb-6">Choose your preferred login-in method</p>
 
-//         <div className="flex mb-6">
-//           {/* <button
-//             type="button"
-//             className="flex-1 py-2 border border-slate-200 rounded-l-lg bg-white text-slate-700 font-medium hover:bg-slate-50"
-//           >
-//             Email
-//           </button> */}
-//           {/* <button
-//             type="button"
-//             className="flex-1 py-2 border-t border-b border-r border-slate-200 rounded-r-lg bg-gray-100 text-slate-500 font-medium hover:bg-gray-100"
-//           >
-//             Phone
-//           </button> */}
-//         </div>
-
+//         {/* Email Input */}
 //         <label className="block text-sm font-medium text-slate-700 mb-1">Email Address</label>
 //         <input
 //           value={email}
@@ -60,36 +60,56 @@
 //           required
 //         />
 
+//         {/* Password Input with Toggle Icon (MODIFIED SECTION) */}
 //         <label className="block text-sm font-medium text-slate-700 mb-1">Password</label>
-//         <input
-//           value={password}
-//           onChange={(e) => setPassword(e.target.value)}
-//           type="password"
-//           placeholder="Enter your password"
-//           className="w-full px-3 py-2 border border-slate-300 rounded-lg mb-6 focus:outline-none focus:ring-2 focus:ring-teal-300 focus:border-transparent"
-//           required
-//         />
+//         <div className="relative mb-6">
+//           <input
+//             value={password}
+//             onChange={(e) => setPassword(e.target.value)}
+//             // Dynamically switch between text and password type
+//             type={showPassword ? "text" : "password"}
+//             placeholder="Enter your password"
+//             // Add padding-right (pr-10) to make space for the toggle icon
+//             className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-300 focus:border-transparent pr-10"
+//             required
+//           />
+//           {/* Toggle Button/Icon */}
+//           <button
+//             type="button"
+//             onClick={togglePasswordVisibility}
+//             className="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-500 hover:text-slate-700"
+//             aria-label={showPassword ? "Hide password" : "Show password"}
+//           >
+//             {showPassword ? (
+//               <AiOutlineEyeInvisible className="h-5 w-5" />
+//             ) : (
+//               <AiOutlineEye className="h-5 w-5" />
+//             )}
+//           </button>
+//         </div>
+//         {/* End of Password Input Modification */}
+
 
 //         {err && <div className="text-red-500 mb-3 text-sm">{err}</div>}
 
 //         <button
 //           type="submit"
 //           disabled={loading}
-//           className="w-full py-3 rounded-lg text-white font-semibold cursor-pointer shadow-md hover:opacity-95"
-//           style={{ background: "linear-gradient(90deg,#05c6d7,#0c9aa3)" }}
+//           className="w-full py-3 rounded-lg text-white font-semibold cursor-pointer shadow-md transition duration-150 ease-in-out"
+//           style={{ background: "linear-gradient(90deg,#05c6d7,#0c9aa3)", opacity: loading ? 0.7 : 1 }}
 //         >
 //           {loading ? "Signing in..." : "Log In with Email"}
 //         </button>
 
 //         <div className="text-center mt-6 text-sm">
 //           Don't have an account?{" "}
-//           <Link to="/signup" className="text-teal-600 font-medium">
+//           <Link to="/signup" className="text-teal-600 font-medium hover:underline">
 //             Sign up here
 //           </Link>
 //         </div>
 
 //         <div className="text-center mt-3 text-sm">
-//           <Link to="/" className="text-teal-500">
+//           <Link to="/" className="text-teal-500 hover:text-teal-600">
 //             Back to Home
 //           </Link>
 //         </div>
@@ -100,122 +120,137 @@
 
 // export default SignIn;
 
-
 // src/SignIn.jsx
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-// Assuming you have a library like react-icons installed
-import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai"; 
 import { useAuth } from "./AuthProvider";
+import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai"; 
 
 function SignIn() {
-  const { login } = useAuth();
-  const navigate = useNavigate();
+  const { login } = useAuth();
+  const navigate = useNavigate();
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [err, setErr] = useState("");
-  const [loading, setLoading] = useState(false);
-  // NEW STATE: To manage password visibility
-  const [showPassword, setShowPassword] = useState(false); 
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [err, setErr] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false); 
 
-  const togglePasswordVisibility = () => {
-    setShowPassword((prev) => !prev);
-  };
+  const togglePasswordVisibility = () => {
+    setShowPassword((prev) => !prev);
+  };
 
-  const submit = async (e) => {
-    e.preventDefault();
-    setErr("");
-    setLoading(true);
-    try {
-      // NOTE: Your navigation destination was root ('/') previously, 
-      // but typically after sign-in, you might go to a dashboard or profile.
-      await login(email, password);
-      navigate("/");
-    } catch (error) {
-      // Catch specific Firebase/Auth error messages if possible
-      setErr(error.message || "Login failed. Please check your credentials.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const submit = async (e) => {
+    e.preventDefault();
+    setErr("");
+    setLoading(true);
 
-  return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4">
-      <form
-        onSubmit={submit}
-        className="w-full max-w-md bg-white rounded-xl shadow-lg p-8 border border-slate-200 relative z-10"
-      >
-        <h2 className="text-2xl font-bold text-slate-800 mb-2">Login</h2>
-        <p className="text-slate-500 mb-6">Choose your preferred login-in method</p>
+    try {
+      // The login function returns { success: boolean, message: string }
+      const result = await login(email, password);
 
-        {/* Email Input */}
-        <label className="block text-sm font-medium text-slate-700 mb-1">Email Address</label>
-        <input
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          type="email"
-          placeholder="john@example.com"
-          className="w-full px-3 py-2 border border-slate-300 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-teal-300 focus:border-transparent"
-          required
-        />
+      if (result.success) {
+        // FIX: Successful login redirects directly to the protected registration page
+        navigate("/register"); 
+      } else {
+        // Failure: Analyze the error message
+        const errorMessage = result.message || "Login failed. Please check your credentials.";
 
-        {/* Password Input with Toggle Icon (MODIFIED SECTION) */}
-        <label className="block text-sm font-medium text-slate-700 mb-1">Password</label>
-        <div className="relative mb-6">
-          <input
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            // Dynamically switch between text and password type
-            type={showPassword ? "text" : "password"}
-            placeholder="Enter your password"
-            // Add padding-right (pr-10) to make space for the toggle icon
-            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-300 focus:border-transparent pr-10"
-            required
-          />
-          {/* Toggle Button/Icon */}
-          <button
-            type="button"
-            onClick={togglePasswordVisibility}
-            className="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-500 hover:text-slate-700"
-            aria-label={showPassword ? "Hide password" : "Show password"}
-          >
-            {showPassword ? (
-              <AiOutlineEyeInvisible className="h-5 w-5" />
-            ) : (
-              <AiOutlineEye className="h-5 w-5" />
-            )}
-          </button>
-        </div>
-        {/* End of Password Input Modification */}
+        // 🛑 CRITICAL FIX: Check for keywords indicating account non-existence (backend dependent)
+        if (
+            errorMessage.toLowerCase().includes("user not found") || 
+            errorMessage.toLowerCase().includes("invalid credentials") ||
+            errorMessage.toLowerCase().includes("account not found")
+        ) {
+            // FORCED SIGN UP REDIRECTION
+            setErr("Account not found. You must sign up first.");
+            setTimeout(() => {
+                navigate("/signup"); 
+            }, 1500); 
+        } else {
+            setErr(errorMessage);
+        }
+      }
+    } catch (e) {
+      setErr(e.message || "An unexpected error occurred during login.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
 
-        {err && <div className="text-red-500 mb-3 text-sm">{err}</div>}
+  return (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4">
+      <form
+        onSubmit={submit}
+        className="w-full max-w-md bg-white rounded-xl shadow-lg p-8 border border-slate-200 relative z-10"
+      >
+        <h2 className="text-2xl font-bold text-slate-800 mb-2">Sign in to your Account</h2>
+        <p className="text-slate-500 mb-6">Access the marathon registration system.</p>
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full py-3 rounded-lg text-white font-semibold cursor-pointer shadow-md transition duration-150 ease-in-out"
-          style={{ background: "linear-gradient(90deg,#05c6d7,#0c9aa3)", opacity: loading ? 0.7 : 1 }}
-        >
-          {loading ? "Signing in..." : "Log In with Email"}
-        </button>
+        {/* Email Input */}
+        <label className="block text-sm font-medium text-slate-700 mb-1">Email Address</label>
+        <input
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          type="email"
+          placeholder="john@example.com"
+          className="w-full px-3 py-2 border border-slate-300 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-teal-300 focus:border-transparent"
+          required
+        />
 
-        <div className="text-center mt-6 text-sm">
-          Don't have an account?{" "}
-          <Link to="/signup" className="text-teal-600 font-medium hover:underline">
-            Sign up here
-          </Link>
-        </div>
+        {/* Password Input with Toggle Icon */}
+        <label className="block text-sm font-medium text-slate-700 mb-1">Password</label>
+        <div className="relative mb-6">
+          <input
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            type={showPassword ? "text" : "password"}
+            placeholder="Enter your password"
+            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-300 focus:border-transparent pr-10"
+            required
+          />
+          <button
+            type="button"
+            onClick={togglePasswordVisibility}
+            className="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-500 hover:text-slate-700"
+            aria-label={showPassword ? "Hide password" : "Show password"}
+          >
+            {showPassword ? (
+              <AiOutlineEyeInvisible className="h-5 w-5" />
+            ) : (
+              <AiOutlineEye className="h-5 w-5" />
+            )}
+          </button>
+        </div>
 
-        <div className="text-center mt-3 text-sm">
-          <Link to="/" className="text-teal-500 hover:text-teal-600">
-            Back to Home
-          </Link>
-        </div>
-      </form>
-    </div>
-  );
+
+        {err && <div className="text-red-500 mb-3 text-sm">{err}</div>}
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full py-3 rounded-lg text-white font-semibold cursor-pointer shadow-md transition duration-150 ease-in-out"
+          style={{ background: "linear-gradient(90deg,#05c6d7,#0c9aa3)", opacity: loading ? 0.7 : 1 }}
+        >
+          {loading ? "Signing in..." : "Log In with Email"}
+        </button>
+
+        <div className="text-center mt-6 text-sm">
+          Don't have an account?{" "}
+          <Link to="/signup" className="text-teal-600 font-medium hover:underline">
+            Sign up here
+          </Link>
+        </div>
+
+        <div className="text-center mt-3 text-sm">
+          <Link to="/" className="text-teal-500 hover:text-teal-600">
+            Back to Home
+          </Link>
+        </div>
+      </form>
+    </div>
+  );
 }
 
 export default SignIn;

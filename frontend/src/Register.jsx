@@ -1600,7 +1600,7 @@ function Register() {
             if (error.message && error.message.includes("User already has an active registration.")) {
                 
                 // --- QUICKEST TEMPORARY SOLUTION to bypass the alert and move flow ---
-                alert("You have already submitted your registration form. Please proceed directly to the payment page.");
+//                 alert("You have already submitted your registration form. Please proceed directly to the payment page.");
                 currentRegistrationId = "EXISTING_ID_PLACEHOLDER"; 
                 
             } else {

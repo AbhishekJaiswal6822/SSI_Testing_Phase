@@ -23,7 +23,7 @@ function Accomodation() {
     e.preventDefault();
     // Replace with API call later
     console.log("Accommodation request submitted:", form);
-    alert("Accommodation request submitted (demo only).");
+    // alert("Accommodation request submitted (demo only).");
   };
 
   const nights =

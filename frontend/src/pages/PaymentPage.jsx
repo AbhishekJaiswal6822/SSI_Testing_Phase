@@ -270,15 +270,15 @@ function PaymentPage() {
             });
 
             if (response.success) {
-                alert("Payment Verified! Registration Complete.");
+                // alert("Payment Verified! Registration Complete.");
                 // Redirect to a dedicated success page
                 navigate("/payment-success", { state: { registrationId: registrationId } });
             } else {
-                 alert("Payment Verification Failed by Server.");
+                //  alert("Payment Verification Failed by Server.");
             }
         } catch (error) {
             console.error("Payment Verification Error:", error);
-            alert("Payment Verification Failed. Contact Support.");
+            // alert("Payment Verification Failed. Contact Support.");
         }
     };
 
@@ -344,12 +344,12 @@ function PaymentPage() {
             const rzp = new window.Razorpay(options);
             rzp.on('payment.failed', function (response){
                 console.error("Payment Failed:", response.error);
-                alert("Payment Failed: " + response.error.description);
+                // alert("Payment Failed: " + response.error.description);
             });
             rzp.open();
         } catch (err) {
             console.error("Payment Error:", err.message);
-            alert(`Payment failed: ${err.message}. Please try again.`);
+            // alert(`Payment failed: ${err.message}. Please try again.`);
         } finally {
             setLoading(false);
         }

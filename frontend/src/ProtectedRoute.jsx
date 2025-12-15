@@ -63,7 +63,7 @@ const ProtectedRoute = ({ children, requiredRole }) => {
     // 3. Check for required role
     if (requiredRole && user.role !== requiredRole) {
         // If logged in but role does not match (e.g., 'user' trying to access 'admin' page)
-        alert("Access Denied: You do not have permission to view this page.");
+        // alert("Access Denied: You do not have permission to view this page.");
         return <Navigate to="/" replace />; // Redirect to a safe page (e.g., Home)
     }
 
