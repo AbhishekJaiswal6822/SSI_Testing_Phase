@@ -99,7 +99,7 @@ import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 // Imports for and Payment
-import PaymentPage from "./pages/PaymentPage"; 
+import PaymentPage from "./pages/PaymentPage";
 
 // Imports for Auth and Protection
 import { AuthProvider } from "./AuthProvider";
@@ -150,7 +150,7 @@ function App() {
                                 path="/payment"
                                 element={<ProtectedRoute><PaymentPage /></ProtectedRoute>}
                             />
-                            
+
                             {/* --- RBAC ROUTES (Requiring ADMIN ROLE) --- */}
                             <Route
                                 path="/admin"
@@ -180,7 +180,15 @@ function App() {
                             <Route path="/dashboard" element={<UnderMaintenance />} />
                             <Route path="/faqs" element={<Faqs />} />
                             <Route path="/privacy&policies" element={<PrivacyPolicy />} />
-                            <Route path="/payment-success" element={<PaymentSuccessPage />} />
+                            <Route
+                                path="/payment-success"
+                                element={
+                                    <ProtectedRoute>
+                                        <PaymentSuccessPage />
+                                    </ProtectedRoute>
+                                }
+                            />
+
                         </Routes>
                     </main>
 

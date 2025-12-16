@@ -17,7 +17,7 @@ function EventInformation() {
           </p>
 
           {/* 4 Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
 
             {/* Card 1 */}
             <div className="bg-white border border-slate-200 rounded-2xl shadow-sm px-6 py-10 text-center">
@@ -44,12 +44,13 @@ function EventInformation() {
             </div>
 
             {/* Card 4 */}
-            {/* <div className="bg-white border border-slate-200 rounded-2xl shadow-sm px-6 py-10 text-center">
+             <div className="bg-white border border-slate-200 rounded-2xl shadow-sm px-6 py-10 text-center">
               <LuClock className="text-teal-600 text-4xl mx-auto mb-4" />
               <h3 className="text-xl font-semibold text-slate-800">Cut-off Time</h3>
               <p className="text-slate-700 font-medium mt-2">6 Hours</p>
               <p className="text-slate-400 mt-1">Maximum</p>
-            </div> */}
+            </div>
+            
 
           </div>
         </div>

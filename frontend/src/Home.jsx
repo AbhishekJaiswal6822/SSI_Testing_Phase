@@ -14,8 +14,8 @@ function Home() {
     <main className="w-full overflow-x-hidden">
       <HeroSection />
       <EventCountdown />
-      {/* <EventInformation /> */}
-      {/* <RaceCategories /> */}
+      {/* <EventInformation />   */}
+      {/* <RaceCategories />   */}
       <EventOverview />
       {/* <PrizesRewards /> */}
       <Sponsors />

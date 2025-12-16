@@ -22,7 +22,8 @@ function Sponsors() {
       
 
         {/* Sponsor List Grid Container */}
-        <div className="flex flex-wrap justify-center items-center gap-8 md:gap-12">
+        <div>
+    <div className="flex flex-wrap justify-center items-center gap-8 md:gap-12">
           {sponsors.map((sponsor) => (
             <div
               key={sponsor.id}
@@ -41,10 +42,13 @@ function Sponsors() {
                 ) : (
                     <span className="text-5xl mb-2">{sponsor.icon}</span>
                 )}
-              <p className="text-slate-700 font-medium mt-2 text-sm text-center">{sponsor.name}</p>
+{/*               <p className="text-slate-700 font-medium mt-2 text-sm text-center">{sponsor.name}</p> */}
             </div>
+
           ))}
         </div>
+<p className="text-slate-700 mt-2 text-sm text-center font-extrabold">Execute Partner</p>
+</div>
 
       </div>
     </section>

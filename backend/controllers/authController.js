@@ -1,109 +1,121 @@
 // C:\Users\abhis\OneDrive\Desktop\SOFTWARE_DEVELOPER_LEARNING\marathon_project\backend\controllers\authController.js
 
-const User = require('../models/User'); // Import the User model
-const bcrypt = require('bcryptjs'); 
-const jwt = require('jsonwebtoken'); 
+const User = require('../models/User');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
-// Controller function for handling user registration
+// =======================
+// REGISTER USER
+// =======================
 exports.registerUser = async (req, res) => {
-    // 1. Get user input from the request body
-    const { name, email, password, phone } = req.body;
+  const { name, email, password, phone } = req.body;
 
-    // Basic Input Validation
-    if (!name || !email || !password) {
-        return res.status(400).json({ message: 'Please enter all required fields.' });
-    }
+  // Basic validation
+  if (!name || !email || !password) {
+    return res.status(400).json({ message: 'Please enter all required fields.' });
+  }
 
-    try {
-        // 2. Check if user already exists
-        let user = await User.findOne({ email });
-        if (user) {
-            return res.status(400).json({ message: 'User already exists with this email address.' });
-        }
+  // ✅ NORMALIZE EMAIL
+  const emailNormalized = email.trim().toLowerCase();
 
-        // 3. Create a new user instance
-        user = new User({
-            name,
-            email,
-            password,
-            phone: phone || null, // Use null if phone is missing
-        });
+  try {
+    // Check if user already exists
+    let user = await User.findOne({ email: emailNormalized });
+    if (user) {
+      return res.status(400).json({
+        message: 'User already exists with this email address.',
+      });
+    }
 
-        // 4. Hash the password
-        const salt = await bcrypt.genSalt(10);
-        user.password = await bcrypt.hash(password, salt);
+    // Create new user
+    user = new User({
+      name,
+      email: emailNormalized,
+      password,
+      phone: phone || null,
+    });
 
-        // 5. Save the user to the database
-        await user.save();
-        
-        // **********************************************
-        // * FIXED: Generate JWT Token for Autologin *
-        // **********************************************
-        const token = jwt.sign(
-            { id: user._id },
-            process.env.JWT_SECRET,
-            { expiresIn: "7d" }
-        );
+    // Hash password
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(password, salt);
 
-        // 6. Respond to the client with the token and user data for autologin
-        res.status(201).json({ 
-            success: true, 
-            message: 'User registered successfully and logged in!',
-            token, // <-- ADDED: Token for autologin
-            user: { // <-- ADDED: User data for frontend state
-                id: user._id,
-                name: user.name,
-                email: user.email,
-                phone: user.phone,
-            },
-        });
+    // Save user
+    await user.save();
 
-    } catch (err) {
-        console.error(err.message);
-        res.status(500).send('Server Error during registration');
-    }
+    // Generate JWT (auto-login)
+    const token = jwt.sign(
+      { id: user._id },
+      process.env.JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    res.status(201).json({
+      success: true,
+      message: 'User registered successfully and logged in!',
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+      },
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server Error during registration' });
+  }
 };
 
-
+// =======================
+// LOGIN USER
+// =======================
 exports.loginUser = async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password } = req.body;
 
-  if (!email || !password) {
-    return res.status(400).json({ message: "Email and password required" });
-  }
+  if (!email || !password) {
+    return res.status(400).json({ message: 'Email and password required' });
+  }
 
-  try {
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
+  // ✅ Normalize email
+  const emailNormalized = email.trim().toLowerCase();
 
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(401).json({ message: "Invalid password" });
-    }
+  try {
+    const user = await User.findOne({ email: emailNormalized });
 
-    const token = jwt.sign(
-      { id: user._id },
-      process.env.JWT_SECRET,
-      { expiresIn: "7d" }
-    );
+    if (!user) {
+      return res.status(404).json({
+        errorCode: 'USER_NOT_FOUND',
+        message: 'Account does not exist',
+      });
+    }
 
-    // ADD THIS LINE for terminal output
-    console.log(`[AUTH SUCCESS]: User ${user.email} logged in successfully.`);
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ message: 'Invalid password' });
+    }
 
-    res.json({
-      success: true,
-      token,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        phone: user.phone,
-      },
-    });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Server error during login" });
-  }
+    const token = jwt.sign(
+      { id: user._id },
+      process.env.JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    // ✅ SUCCESS RESPONSE
+    return res.json({
+      success: true,
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+      },
+    });
+
+  } catch (err) {
+    console.error('Login error:', err.message);
+    return res.status(500).json({ message: 'Server error during login' });
+  }
 };
+

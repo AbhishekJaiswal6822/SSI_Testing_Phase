@@ -83,7 +83,8 @@ mongoose.connect(MONGO_URI)
 // --- 2. MOUNT ALL ROUTES (FIXED) ---
 
 // a. Authentication (MISSING in your provided code, now correctly added)
-app.use('/api/auth', authRoutes); 
+app.use("/api/auth", require("./routes/authRoutes"));
+
 
 // b. Registration (Prefix: /api/register)
 app.use('/api/register', registrationRoutes); 

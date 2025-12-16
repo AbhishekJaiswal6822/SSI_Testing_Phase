@@ -14,7 +14,9 @@ const razorpay = new Razorpay({
 });
 
 // 1. Route for creating the order
-router.post("/order", async (req, res) => {
+const authMiddleware = require('../middleware/authMiddleware');
+router.post("/order", authMiddleware, async (req, res) => {
+
     try {
         const { amount } = req.body;
 
@@ -42,6 +44,6 @@ router.post("/order", async (req, res) => {
 
 // 2. CRITICAL NEW ROUTE: For payment verification and DB update
 // The function (paymentController.verifyPayment) is now correctly imported and callable.
-router.post("/verify", paymentController.verifyPayment);
+router.post("/verify", authMiddleware, paymentController.verifyPayment);
 
 module.exports = router;

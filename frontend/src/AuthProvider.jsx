@@ -224,7 +224,12 @@ export function AuthProvider({ children }) {
             });
             return { success: true, user: data.user };
         }
-        return { success: false, message: data.message || 'Login failed' };
+        return {
+  success: false,
+  message: data.message || "Login failed",
+  errorCode: data.errorCode || null
+};
+
     } catch (error) {
         return { success: false, message: error.message || 'Network error' };
     } finally {

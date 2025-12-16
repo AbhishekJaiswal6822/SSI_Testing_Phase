@@ -11,10 +11,16 @@ router.post('/register', (req, res, next) => {
 }, registerUser);
 
 // Login route
-router.post('/login', (req, res, next) => {
-  console.log('[BACKEND RECEIVING]: POST /api/auth/login hit successfully');
-  console.log('Request body:', req.body);
-  next();
-}, loginUser);
+router.post(
+  '/signin',
+  (req, res, next) => {
+    // console.log('[BACKEND RECEIVING]: POST /api/auth/signin hit successfully');
+    // console.log('Request body:', req.body);
+    router.post('/signin', loginUser);
+
+    next();
+  },
+  loginUser
+);
 
 module.exports = router;

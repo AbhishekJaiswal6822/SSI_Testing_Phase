@@ -151,7 +151,7 @@ function SignIn() {
 
       if (result.success) {
         // FIX: Successful login redirects directly to the protected registration page
-        navigate("/register"); 
+        navigate("/"); 
       } else {
         // Failure: Analyze the error message
         const errorMessage = result.message || "Login failed. Please check your credentials.";

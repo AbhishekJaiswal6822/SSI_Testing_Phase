@@ -71,11 +71,22 @@ exports.submitRegistration = async (req, res) => {
 
     try {
         // --- Prevent Duplicate Registration ---
-        const existingRegistration = await Registration.findOne({ user: userId });
-        if (existingRegistration) {
-            fs.unlinkSync(req.file.path); 
-            return res.status(400).json({ message: 'User already has an active registration.' });
-        }
+       const existingRegistration = await Registration.findOne({ user: userId });
+
+if (existingRegistration) {
+  if (req.file) {
+    fs.unlinkSync(req.file.path);
+  }
+
+  return res.status(400).json({
+    errorCode: "REGISTRATION_EXISTS",
+    message: "User already has an active registration.",
+    registrationId: existingRegistration._id
+  });
+}
+
+
+
 
         // --- Create New Registration Document with CORRECT MAPPING ---
         const newRegistration = new Registration({
