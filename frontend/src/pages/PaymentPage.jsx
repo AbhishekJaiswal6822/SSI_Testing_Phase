@@ -21,7 +21,7 @@ const loadRazorpayScript = () => {
 function PaymentPage() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { token } = useAuth(); // ✅ FIX 1: Get token
+  const { token } = useAuth();
   const [loading, setLoading] = useState(false);
 
   const {
@@ -32,7 +32,6 @@ function PaymentPage() {
     groupName = "",
   } = location.state || {};
 
-  // --- Initial Guard ---
   if (!location.state || amount <= 0 || !registrationId) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -43,32 +42,28 @@ function PaymentPage() {
     );
   }
 
-  // --- Verify Payment ---
- const verifyPayment = async (paymentDetails) => {
-  try {
-    const response = await api("/api/payment/verify", {
-      method: "POST",
-      body: {
-        ...paymentDetails,
-        registrationId,
-      },
-      token,
-    });
-
-    if (response.success) {
-      // ✅ HARD STOP → redirect to success page
-      navigate("/payment-success", {
-        replace: true, // ⛔ prevents back-navigation loop
-        state: { registrationId },
+  const verifyPayment = async (paymentDetails) => {
+    try {
+      const response = await api("/api/payment/verify", {
+        method: "POST",
+        body: {
+          ...paymentDetails,
+          registrationId,
+        },
+        token,
       });
+
+      if (response.success) {
+        navigate("/payment-success", {
+          replace: true,
+          state: { registrationId },
+        });
+      }
+    } catch (error) {
+      console.error("Payment Verification Error:", error);
     }
-  } catch (error) {
-    console.error("Payment Verification Error:", error);
-  }
-};
+  };
 
-
-  // --- Handle Payment ---
   const handlePayment = async () => {
     if (loading) return;
     setLoading(true);
@@ -83,7 +78,7 @@ function PaymentPage() {
           amount,
           registrationId,
         },
-        token, // ✅ FIX 3: token added
+        token,
       });
 
       const { key, order } = response;
@@ -94,13 +89,23 @@ function PaymentPage() {
         throw new Error("Invalid order response from backend");
       }
 
-      const options = {
+     const options = {
         key,
         amount: orderAmount,
         currency: "INR",
         name: "Sprints Saga India",
         description: `Marathon Reg for ${raceCategory}`,
         order_id: orderId,
+        // ✅ Add this here to hide the methods in the UI
+        config: {
+          display: {
+            hide: [
+              { method: "emi" },
+              { method: "paylater" },
+              { method: "wallet" },
+            ],
+          },
+        },
         handler: function (response) {
           verifyPayment(response);
         },
@@ -131,9 +136,7 @@ function PaymentPage() {
         <div className="space-y-3 text-sm">
           <div className="flex justify-between">
             <span className="text-slate-600">Registration Type:</span>
-            <span className="font-semibold capitalize">
-              {registrationType}
-            </span>
+            <span className="font-semibold capitalize">{registrationType}</span>
           </div>
 
           <div className="flex justify-between">
@@ -149,12 +152,8 @@ function PaymentPage() {
           )}
 
           <div className="flex justify-between pt-3 border-t">
-            <span className="text-slate-700 font-semibold">
-              Total Amount:
-            </span>
-            <span className="text-xl font-extrabold text-teal-700">
-              ₹{amount}
-            </span>
+            <span className="text-slate-700 font-semibold">Total Amount:</span>
+            <span className="text-xl font-extrabold text-teal-700">₹{amount}</span>
           </div>
         </div>
 

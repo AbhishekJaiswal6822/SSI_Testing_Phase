@@ -4,9 +4,8 @@
 // // Initialize the Razorpay instance
 // const razorpayInstance = new Razorpay({
 //     key_id: process.env.RAZORPAY_KEY_ID,
-//     key_secret: process.env.RAZORPAY_SECRET, // must match .env
+//     key_secret: process.env.RAZORPAY_SECRET, // Ensure this matches your .env
 // });
-
 
 // // --------------------------------------------------
 // // 1️⃣ Create Razorpay Order
@@ -23,12 +22,14 @@
 
 //     try {
 //         const options = {
-//             amount: Math.round(amount * 100), // paise
+//             amount: Math.round(amount * 100), // amount in paise
 //             currency: 'INR',
 //             receipt: `receipt_${registrationId}`,
 //             notes: {
 //                 registrationId,
 //             },
+//             // Note: 'config' is intentionally omitted here to prevent backend 500 errors.
+//             // UI customization (hiding EMI/Wallets) must be handled in the frontend.
 //         };
 
 //         const order = await razorpayInstance.orders.create(options);
@@ -46,7 +47,6 @@
 //         });
 //     }
 // };
-
 
 // // --------------------------------------------------
 // // 2️⃣ Verify Payment & Update Registration
@@ -67,7 +67,7 @@
 //     }
 
 //     try {
-//         // 🔎 Find registration
+//         // 🔎 Find registration in database
 //         const registration = await Registration.findById(registrationId);
 
 //         if (!registration) {
@@ -77,7 +77,7 @@
 //             });
 //         }
 
-//         // 🚫 PREVENT DUPLICATE PAYMENT (CRITICAL FIX)
+//         // 🚫 PREVENT DUPLICATE PAYMENT
 //         if (registration.registrationStatus === 'Verified') {
 //             return res.status(400).json({
 //                 success: false,
@@ -85,7 +85,7 @@
 //             });
 //         }
 
-//         // ✅ Update registration after successful payment
+//         // ✅ Update registration status and payment details
 //         registration.registrationStatus = 'Verified';
 //         registration.paymentDetails = {
 //             orderId: razorpay_order_id,
@@ -113,16 +113,21 @@
 // };
 
 
-
 const Razorpay = require('razorpay');
 const Registration = require('../models/Registration');
 
 // Initialize the Razorpay instance
 const razorpayInstance = new Razorpay({
     key_id: process.env.RAZORPAY_KEY_ID,
-    key_secret: process.env.RAZORPAY_SECRET, // must match .env
+    // ✅ FIX: Changed to match your .env variable name
+    key_secret: process.env.RAZORPAY_KEY_SECRET, 
 });
 
+// Optional: Temporary log to verify keys are loading in the terminal
+console.log("Razorpay Keys Initialized:", {
+    key_id: !!process.env.RAZORPAY_KEY_ID,
+    key_secret: !!process.env.RAZORPAY_KEY_SECRET
+});
 
 // --------------------------------------------------
 // 1️⃣ Create Razorpay Order
@@ -139,38 +144,25 @@ exports.createOrder = async (req, res) => {
 
     try {
         const options = {
-            amount: Math.round(amount * 100), // paise
+            amount: Math.round(amount * 100), // amount in paise
             currency: 'INR',
             receipt: `receipt_${registrationId}`,
             notes: {
                 registrationId,
             },
-            // -------------------------------------------------------------------
-            // ✅ ADDED CONFIGURATION TO HIDE PAYMENT METHODS (EMI, WALLET, PAY LATER)
-            // -------------------------------------------------------------------
-            config: {
-                display: {
-                    hide: [
-                        { method: 'emi' },      // Hides all EMI options
-                        { method: 'paylater' }, // Hides all Pay Later options
-                        { method: 'wallet' }    // Hides all Wallet options
-                    ]
-                }
-            },
-            // -------------------------------------------------------------------
+            // Note: 'config' is intentionally omitted here to prevent backend 500 errors.
+            // UI customization (hiding EMI/Wallets) is handled in the frontend.
         };
 
         const order = await razorpayInstance.orders.create(options);
 
-        // NOTE: The 'order' object returned here is passed to the frontend.
-        // The frontend then uses this order object and the KEY_ID to open the checkout
-        // The 'config' object is carried along with the order ID to influence the checkout UI.
         return res.status(200).json({
             key: process.env.RAZORPAY_KEY_ID,
             order,
         });
 
     } catch (error) {
+        // This will now show the correct error if keys mismatch
         console.error('Razorpay Order Creation Error:', error);
         return res.status(500).json({
             success: false,
@@ -178,7 +170,6 @@ exports.createOrder = async (req, res) => {
         });
     }
 };
-
 
 // --------------------------------------------------
 // 2️⃣ Verify Payment & Update Registration
@@ -199,7 +190,7 @@ exports.verifyPayment = async (req, res) => {
     }
 
     try {
-        // 🔎 Find registration
+        // 🔎 Find registration in database
         const registration = await Registration.findById(registrationId);
 
         if (!registration) {
@@ -209,7 +200,7 @@ exports.verifyPayment = async (req, res) => {
             });
         }
 
-        // 🚫 PREVENT DUPLICATE PAYMENT (CRITICAL FIX)
+        // 🚫 PREVENT DUPLICATE PAYMENT
         if (registration.registrationStatus === 'Verified') {
             return res.status(400).json({
                 success: false,
@@ -217,7 +208,7 @@ exports.verifyPayment = async (req, res) => {
             });
         }
 
-        // ✅ Update registration after successful payment
+        // ✅ Update registration status and payment details
         registration.registrationStatus = 'Verified';
         registration.paymentDetails = {
             orderId: razorpay_order_id,
