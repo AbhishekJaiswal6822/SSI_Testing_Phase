@@ -256,6 +256,8 @@ function Register() {
         whatsapp: "", dob: "", gender: "", bloodGroup: "", nationality: "",
         address: "", city: "", state: "", pincode: "", country: "Indian",
         experience: "", finishTime: "", dietary: "", tshirtSize: "",
+        referralCode: "",
+        referralPoints: "",
         idType: "",
         idNumber: "",
         idFile: null,
