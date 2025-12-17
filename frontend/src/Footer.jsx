@@ -1,102 +1,153 @@
 // src/Footer.jsx
 import React from "react";
 import { Link } from "react-router-dom";
+import {
+  FaInstagram,
+  FaFacebookF,
+  FaPhoneAlt,
+  FaWhatsapp,
+} from "react-icons/fa";
 
 function Footer() {
   return (
     <footer className="bg-slate-900 text-slate-300">
       <div className="max-w-7xl mx-auto px-6 py-12">
 
-        {/* MAIN GRID: 1 col mobile, 4 cols desktop */}
-        <div className="grid grid-cols-1  md:grid-cols-5 md:grid-row-5 gap-10">
+        {/* GRID */}
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-10">
 
-          {/* 1 — About */}
+          {/* ABOUT */}
           <div>
-            <h1 className="text-white text-lg font-semibold mb-3">Sprints Saga India</h1>
+            <h1 className="text-white text-lg font-semibold mb-3">
+              Sprints Saga India
+            </h1>
             <p className="text-slate-400 leading-relaxed">
               The premier marathon event bringing together runners from around the world.
             </p>
           </div>
 
-          {/* 2 — Quick Links */}
+          {/* QUICK LINKS */}
           <div>
             <h4 className="text-white text-lg font-semibold mb-3">Quick Links</h4>
             <ul className="space-y-3">
-              <li><Link to="/register" className="hover:text-white text-slate-300 hover:underline">Register</Link></li>
-              <li><Link to="/results" className="hover:text-white text-slate-300 hover:underline">Results</Link></li>
-              <li><Link to="/accommodation" className="hover:text-white text-slate-300 hover:underline">Accommodation</Link></li>
+              <li><Link to="/register" className="hover:text-white hover:underline">Register</Link></li>
+              <li><Link to="/results" className="hover:text-white hover:underline">Results</Link></li>
+              <li><Link to="/accommodation" className="hover:text-white hover:underline">Accommodation</Link></li>
             </ul>
           </div>
 
-          {/* 3 — Contact Us - REFACTORED */}
+          {/* CONTACT */}
           <div>
             <h4 className="text-white text-lg font-semibold mb-3">Contact Us</h4>
 
             <p className="text-sm text-slate-400 mb-4">
-              (For any queries, support requests, or partnership opportunities, feel free to reach us through the details below.)
+              (For any queries, support requests, or partnership opportunities, feel free to reach us below.)
             </p>
 
-            {/* REPLACED FLEX CONTAINER WITH SIMPLE DIVS/SPACING */}
             <div className="space-y-4">
-              
-              {/* Email Us */}
-              <div className="min-w-0">
+
+              {/* EMAIL */}
+              <div>
                 <h5 className="text-white font-medium mb-1">Email Us</h5>
-                <p className="text-slate-300 text-sm wrap-break-word whitespace-normal">info.desk@sprintssagaindia.com</p>
-                <h1  className="text-white font-medium mb-1">Bulk Registration</h1>
-                <p className="text-slate-300 text-sm wrap-break-word whitespace-normal">registration@sprintssagaindia.com</p>
+                <p className="text-sm">info.desk@sprintssagaindia.com</p>
+
+                <h5 className="text-white font-medium mt-2 mb-1">
+                  Bulk Registration
+                </h5>
+                <p className="text-sm">registration@sprintssagaindia.com</p>
               </div>
 
-              {/* Social */}
-              <div className="min-w-0">
-                <h5 className="text-white font-medium mb-1">Social Media</h5>
-                <p className="text-slate-300 text-sm wrap-break-word whitespace-normal">Instagram: @sprintssagaindia</p>
-                <p className="text-slate-300 text-sm wrap-break-word whitespace-normal">Facebook: Sprints Saga India</p>
-                {/* <a href="www.google.com">Instagram: @sprintssagaindia</a>
-                <br />
-                <a href="www.google.com">Facebook: Sprints Saga India</a> */}
+              {/* SOCIAL MEDIA */}
+              <div>
+                <h5 className="text-white font-medium mb-2">Social Media</h5>
+
+                <div className="space-y-2">
+                  <a
+                    href="https://www.instagram.com/sprintssagaindia"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-3 hover:text-pink-500 transition"
+                  >
+                    <FaInstagram size={18} />
+                    <span className="text-sm">sprintssagaindia</span>
+                  </a>
+
+                  <a
+                    href="https://www.facebook.com/SprintsSagaIndia"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-3 hover:text-blue-500 transition"
+                  >
+                    <FaFacebookF size={16} />
+                    <span className="text-sm">Sprints Saga India</span>
+                  </a>
+                </div>
               </div>
 
-              {/* Phone */}
-              <div className="shrink-0">
-                <h5 className="text-white font-medium mb-1">Contact Number</h5>
-                <p className="text-slate-300 text-sm">Mobile Number: +91 8850943813</p>
-                <p className="text-slate-300 text-sm">Mobile Number: +91 9967707306</p>
-                <p className="text-slate-300 text-sm">WhatsApp: +91 9987190415</p>
-                
+              {/* PHONE */}
+              <div>
+                <h5 className="text-white font-medium mb-2">Contact Number</h5>
+
+                <div className="space-y-2 text-sm">
+                  <div className="flex items-center gap-3">
+                    <FaPhoneAlt size={14} />
+                    <span> +91 8850943813</span>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <FaPhoneAlt size={14} />
+                    <span>+91 9967707306</span>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <FaWhatsapp size={17} className="text-green-500" />
+                    <span>+91 9987190415</span>
+                  </div>
+                </div>
               </div>
 
             </div>
           </div>
 
-          {/* 4 — FAQs */}
+          {/* FAQ */}
           <div>
             <h4 className="text-white text-lg font-semibold mb-3">FAQs</h4>
             <p className="text-slate-400 text-sm">
-              Need answers? Visit our FAQs for detailed information about registration, race rules, refunds, and more.
+              Need answers? Visit our FAQs for detailed information about registration,
+              race rules, refunds, and more.
             </p>
-            <Link to="/faqs" className="text-teal-400 hover:underline block mt-2">View FAQs</Link>
+            <Link to="/faqs" className="text-teal-400 hover:underline block mt-2">
+              View FAQs
+            </Link>
           </div>
 
-          {/* 4 — Policies */}
-
+          {/* POLICIES */}
           <div>
-            <h4 className="text-white text-lg font-semibold mb-3">Privacy & Policies</h4>
+            <h4 className="text-white text-lg font-semibold mb-3">
+              Privacy & Policies
+            </h4>
             <p className="text-slate-400 text-sm">
-              Your trust matters. Read our Privacy Policy to understand how your information is collected, used, and safeguarded.
+              Your trust matters. Read our Privacy Policy to understand how your
+              information is collected, used, and safeguarded.
             </p>
-            <Link to="/privacy&policies" className="text-teal-400 hover:underline block mt-2">Privacy & Policies</Link>
+            <Link
+              to="/privacy&policies"
+              className="text-teal-400 hover:underline block mt-2"
+            >
+              Privacy & Policies
+            </Link>
           </div>
 
         </div>
 
-        {/* Divider */}
+        {/* DIVIDER */}
         <div className="border-t border-slate-700 mt-10"></div>
 
-        {/* Copyright */}
+        {/* COPYRIGHT */}
         <div className="mt-6 text-center text-slate-400">
           © {new Date().getFullYear()} Sprints Saga India. All rights reserved.
         </div>
+
       </div>
     </footer>
   );
