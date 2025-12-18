@@ -216,6 +216,19 @@ function Register() {
 
     // --- Race Selection State ---
     const [selectedRace, setSelectedRace] = useState(null);
+    React.useEffect(() => {
+        setSelectedRace(null);
+    }, [registrationType]);
+
+    // --- START AUTO-SAVE CODE HERE ---
+    
+
+    // Auto-save Group Data
+    React.useEffect(() => {
+        const membersToSave = groupMembers.map(({ idFile, ...rest }) => rest);
+        localStorage.setItem("temp_group_members", JSON.stringify(membersToSave));
+    }, [groupMembers]);
+    // --- END AUTO-SAVE CODE ---
 
     // --- MODIFIED STATE FOR POPOVER (Unchanged) ---
     const [openPopoverId, setOpenPopoverId] = useState(null);
@@ -244,29 +257,37 @@ function Register() {
 
     // --- Group State (UPDATED: Added queryBox) ---
     const [groupName, setGroupName] = useState("");
-    const [groupMembers, setGroupMembers] = useState([
-        {
-            firstName: "", lastName: "", email: "", phone: "", gender: "", tshirtSize: "", nationality: "", address: "",
-            raceId: "", // Start with "Select race"
-            idType: "",
-            idNumber: "",
-            idFile: null,
-            queryBox: "", // <--- ADDED FIELD for query box fix
-        },
-    ]);
+    const [groupMembers, setGroupMembers] = useState(() => {
+        const saved = localStorage.getItem("temp_group_members");
+        return saved ? JSON.parse(saved) : [
+            {
+                firstName: "", lastName: "", email: "", phone: "", gender: "", tshirtSize: "",
+                nationality: "", address: "", raceId: "", idType: "", idNumber: "",
+                idFile: null, queryBox: "",
+            },
+        ];
+    });
 
     // State for Individual Registration fields (Unchanged)
-    const [individualRunner, setIndividualRunner] = useState({
-        firstName: "", lastName: "", parentName: "", parentPhone: "", email: "", phone: "",
-        whatsapp: "", dob: "", gender: "", bloodGroup: "", nationality: "",
-        address: "", city: "", state: "", pincode: "", country: "",
-        experience: "", finishTime: "", dietary: "", tshirtSize: "",
-        referralCode: "",
-        referralPoints: "",
-        idType: "",
-        idNumber: "",
-        idFile: null,
+    const [individualRunner, setIndividualRunner] = useState(() => {
+        const saved = localStorage.getItem("temp_individual_runner");
+        return saved ? JSON.parse(saved) : {
+            firstName: "", lastName: "", parentName: "", parentPhone: "", email: "", phone: "",
+            whatsapp: "", dob: "", gender: "", bloodGroup: "", nationality: "",
+            address: "", city: "", state: "", pincode: "", country: "",
+            experience: "", finishTime: "", dietary: "", tshirtSize: "",
+            referralCode: "", referralPoints: "", idType: "", idNumber: "", idFile: null,
+        };
     });
+    React.useEffect(() => {
+        const { idFile, ...dataToSave } = individualRunner;
+        localStorage.setItem("temp_individual_runner", JSON.stringify(dataToSave));
+    }, [individualRunner]);
+
+    React.useEffect(() => {
+        const membersToSave = groupMembers.map(({ idFile, ...rest }) => rest);
+        localStorage.setItem("temp_group_members", JSON.stringify(membersToSave));
+    }, [groupMembers]);
 
     // --- CRITICAL FIX FOR UNCONTROLLED INPUT ERROR ---
     const handleIndividualChange = (field, value) => {
@@ -291,7 +312,7 @@ function Register() {
 
     // Helper functions (UPDATED: Added queryBox)
     const newMemberObject = () => ({
-        firstName: "", lastName: "", email: "", phone: "", gender: "", tshirtSize: "", nationality: "", address: "", 
+        firstName: "", lastName: "", email: "", phone: "", gender: "", tshirtSize: "", nationality: "", address: "",
         raceId: "",
         idType: "", idNumber: "", idFile: null,
         queryBox: "", // <--- ADDED FIELD for query box fix
@@ -685,6 +706,9 @@ function Register() {
         let currentRegistrationId = null;
 
         try {
+
+            localStorage.removeItem("temp_individual_runner");
+            localStorage.removeItem("temp_group_members");
             // --- ATTEMPT TO SAVE REGISTRATION DETAILS ---
             console.log("[FRONTEND SAVING REGISTRATION]: POST /api/register");
 
