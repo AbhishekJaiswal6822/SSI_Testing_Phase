@@ -1,45 +1,4 @@
-// const express = require('express');
-// const mongoose = require('mongoose');
-// const dotenv = require('dotenv');
-// const cors = require('cors'); 
 
-// dotenv.config(); 
-
-// const authRoutes = require('./routes/authRoutes');
-
-// const app = express();
-// const PORT = process.env.PORT || 8000;
-// const MONGO_URI = process.env.MONGO_URI; 
-
-// // --- CRITICAL MIDDLEWARE ORDER ---
-
-// // 1. Universal CORS (MUST be the simplest setting to eliminate config errors)
-// app.use(cors()); 
-
-// // 2. JSON Body Parser (MUST be before any routes that process body data)
-// app.use(express.json());
-
-// // --- Database Connection ---
-// mongoose.connect(MONGO_URI)
-//     .then(() => console.log('MongoDB connected successfully'))
-//     .catch(err => console.error('MongoDB connection error:', err.message)); 
-
-// // --- Routes ---
-// app.use('/api/auth', authRoutes);
-
-// app.get('/', (req, res) => {
-//     res.send('Marathon Project Backend Running!');
-// });
-
-// // --- Start Server ---
-// app.listen(PORT, () => {
-//     console.log(`Server listening on port ${PORT}`);
-// });
-
-// // payment connection
-// const paymentRoutes = require("./routes/paymentRoutes");
-
-// app.use("/api/payment", paymentRoutes);
 
 // C:\Users\abhis\OneDrive\Desktop\SOFTWARE_DEVELOPER_LEARNING\marathon_project\backend\server.js - DEFINITIVE CORRECT CODE
 
@@ -60,10 +19,27 @@ const app = express();
 const PORT = process.env.PORT || 8000;
 const MONGO_URI = process.env.MONGO_URI; 
 
+const allowedOrigins = [
+  'http://localhost:4173', 
+  'https://ssi-testing-frontend-phase-1.onrender.com' // Add your Render URL here
+];
+
 // --- CRITICAL MIDDLEWARE ORDER ---
 
 // 1. Universal CORS 
-app.use(cors()); 
+// app.use(cors()); 
+
+app.use(cors({
+  origin: function (origin, callback) {
+    // allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) === -1) {
+      return callback(new Error('CORS policy: This origin is not allowed'), false);
+    }
+    return callback(null, true);
+  },
+  credentials: true
+}));
 
 // 2. JSON Body Parser (for parsing incoming JSON data)
 app.use(express.json());
