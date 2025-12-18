@@ -9,6 +9,8 @@ import { useAuth } from "./AuthProvider";
 // 1. IMPORT TOAST FOR MODERN NOTIFICATIONS
 import { toast } from 'react-toastify';
 
+const REGISTRATION_DATA_VERSION = "v1.0"; // Change this to "v1.1" when keys change
+
 // --- CONFIGURATION CONSTANTS ---
 const PG_FEE_RATE = 0.021; // 2.1% Payment Gateway Fee
 const GST_RATE = 0.18;    // 18% GST (Applied only to PG Fee)
@@ -221,7 +223,7 @@ function Register() {
     }, [registrationType]);
 
     // --- START AUTO-SAVE CODE HERE ---
-    
+
 
     // Auto-save Group Data
     React.useEffect(() => {
@@ -258,27 +260,60 @@ function Register() {
     // --- Group State (UPDATED: Added queryBox) ---
     const [groupName, setGroupName] = useState("");
     const [groupMembers, setGroupMembers] = useState(() => {
-        const saved = localStorage.getItem("temp_group_members");
-        return saved ? JSON.parse(saved) : [
-            {
-                firstName: "", lastName: "", email: "", phone: "", gender: "", tshirtSize: "",
-                nationality: "", address: "", raceId: "", idType: "", idNumber: "",
-                idFile: null, queryBox: "",
-            },
-        ];
-    });
+    const savedVersion = localStorage.getItem("data_version");
+    const groupDefault = [{ 
+        firstName: "", lastName: "", email: "", phone: "", gender: "", tshirtSize: "", 
+        nationality: "", address: "", raceId: "", idType: "", idNumber: "", 
+        idFile: null, queryBox: "" 
+    }];
+
+    // Only clear if the version check wasn't already handled by the individualRunner block
+    if (savedVersion !== REGISTRATION_DATA_VERSION) {
+        // (Removal and version set are handled above; just return the default here)
+        return groupDefault;
+    }
+
+    const saved = localStorage.getItem("temp_group_members");
+    if (saved) {
+        try {
+            return JSON.parse(saved);
+        } catch (e) {
+            return groupDefault;
+        }
+    }
+    return groupDefault;
+});
 
     // State for Individual Registration fields (Unchanged)
     const [individualRunner, setIndividualRunner] = useState(() => {
-        const saved = localStorage.getItem("temp_individual_runner");
-        return saved ? JSON.parse(saved) : {
-            firstName: "", lastName: "", parentName: "", parentPhone: "", email: "", phone: "",
-            whatsapp: "", dob: "", gender: "", bloodGroup: "", nationality: "",
-            address: "", city: "", state: "", pincode: "", country: "",
-            experience: "", finishTime: "", dietary: "", tshirtSize: "",
-            referralCode: "", referralPoints: "", idType: "", idNumber: "", idFile: null,
-        };
-    });
+    const savedVersion = localStorage.getItem("data_version");
+    const standardDefault = {
+        firstName: "", lastName: "", parentName: "", parentPhone: "", email: "", phone: "",
+        whatsapp: "", dob: "", gender: "", bloodGroup: "", nationality: "",
+        address: "", city: "", state: "", pincode: "", country: "",
+        experience: "", finishTime: "", dietary: "", tshirtSize: "",
+        referralCode: "", referralPoints: "", idType: "", idNumber: "", idFile: null,
+    };
+
+    // If version is missing or old, ignore the cache and start fresh
+    if (savedVersion !== REGISTRATION_DATA_VERSION) {
+        localStorage.removeItem("temp_individual_runner");
+        localStorage.removeItem("temp_group_members");
+        localStorage.setItem("data_version", REGISTRATION_DATA_VERSION);
+        return standardDefault;
+    }
+
+    const saved = localStorage.getItem("temp_individual_runner");
+    if (saved) {
+        try {
+            return JSON.parse(saved);
+        } catch (e) {
+            console.error("Storage parse error:", e);
+            return standardDefault;
+        }
+    }
+    return standardDefault;
+});
     React.useEffect(() => {
         const { idFile, ...dataToSave } = individualRunner;
         localStorage.setItem("temp_individual_runner", JSON.stringify(dataToSave));
