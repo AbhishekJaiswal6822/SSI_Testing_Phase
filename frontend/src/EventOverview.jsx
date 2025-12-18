@@ -54,7 +54,7 @@ export default function EventOverview() {
           <InfoCard
             icon={<LuUsers />}
             title="Race Category"
-            value="5K, 10K, 22K, 35K, 42K"
+            value="5K, 10K, 21K, 35K, 42K"
           />
         </div>
 

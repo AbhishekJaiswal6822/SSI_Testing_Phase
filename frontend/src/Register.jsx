@@ -1,6 +1,6 @@
 ﻿// C:\Users\abhis\OneDrive\Desktop\SOFTWARE_DEVELOPER_LEARNING\marathon_project\frontend\src\Register.jsx - FINAL STABLE VERSION
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { RACE_PRICING } from "./constants/racePricing";
 import { useNavigate } from "react-router-dom";
 import { AiOutlineClose } from "react-icons/ai";
@@ -204,11 +204,15 @@ const IdUploadBlock = ({ idType, idNumber, idFile, handleTypeChange, handleNumbe
 
 function Register() {
     // Use the 10K prebook price for default calculation if needed
-    const defaultRace = raceCategories.find(r => r.id === '10k');
+    const defaultRace = raceCategories.find(r => r.id === '5k');
     const { token, user } = useAuth();
 
     const [registrationType, setRegistrationType] = useState("individual");
     const [isSubmitting, setIsSubmitting] = useState(false);
+    // Reset race selection when switching between Individual, Group, or Charity
+    React.useEffect(() => {
+        setSelectedRace(null);
+    }, [registrationType]);
 
     // --- Race Selection State ---
     const [selectedRace, setSelectedRace] = useState(null);
@@ -243,7 +247,7 @@ function Register() {
     const [groupMembers, setGroupMembers] = useState([
         {
             firstName: "", lastName: "", email: "", phone: "", gender: "", tshirtSize: "", nationality: "", address: "",
-            raceId: defaultRace.id,
+            raceId: "", // Start with "Select race"
             idType: "",
             idNumber: "",
             idFile: null,
@@ -287,7 +291,8 @@ function Register() {
 
     // Helper functions (UPDATED: Added queryBox)
     const newMemberObject = () => ({
-        firstName: "", lastName: "", email: "", phone: "", gender: "", tshirtSize: "", nationality: "", address: "", raceId: defaultRace.id,
+        firstName: "", lastName: "", email: "", phone: "", gender: "", tshirtSize: "", nationality: "", address: "", 
+        raceId: "",
         idType: "", idNumber: "", idFile: null,
         queryBox: "", // <--- ADDED FIELD for query box fix
     });
@@ -798,7 +803,7 @@ function Register() {
 
     if (isSubmitting) {
         buttonText = `Payment Processing - ₹${totalAmountPayable.toFixed(2)}`;
-    } else if (isRaceSelectionValid && !isOverGroupLimit) { 
+    } else if (isRaceSelectionValid && !isOverGroupLimit) {
         // We add !isOverGroupLimit so it doesn't overwrite the partnership message
         buttonText = `Proceed to Payment - ₹${totalAmountPayable.toFixed(2)}`;
         buttonDisabled = false;
