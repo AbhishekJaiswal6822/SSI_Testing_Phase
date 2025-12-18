@@ -208,6 +208,7 @@ function Register() {
     const { token, user } = useAuth();
 
     const [registrationType, setRegistrationType] = useState("individual");
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     // --- Race Selection State ---
     const [selectedRace, setSelectedRace] = useState(null);
@@ -254,7 +255,7 @@ function Register() {
     const [individualRunner, setIndividualRunner] = useState({
         firstName: "", lastName: "", parentName: "", parentPhone: "", email: "", phone: "",
         whatsapp: "", dob: "", gender: "", bloodGroup: "", nationality: "",
-        address: "", city: "", state: "", pincode: "", country: "Indian",
+        address: "", city: "", state: "", pincode: "", country: "",
         experience: "", finishTime: "", dietary: "", tshirtSize: "",
         referralCode: "",
         referralPoints: "",
@@ -627,17 +628,20 @@ function Register() {
     // --- CRITICAL FIX: ASYNC API SUBMISSION (UPDATED TOAST) ---
     const handleProceedToPayment = async (e) => {
         e.preventDefault();
+        setIsSubmitting(true);
 
         // *** START FIX 2: Dismiss all toasts before validation and submission ***
         toast.dismiss();
         // *** END FIX 2 ***
 
         if (!validateForm()) {
+            setIsSubmitting(false);
             return;
         }
 
         if (!token) {
             toast.error("Error: User session expired. Please log in again.");
+            setIsSubmitting(false);
             return;
         }
 
@@ -694,6 +698,7 @@ function Register() {
 
         }
         catch (error) {
+            setIsSubmitting(false);
             console.error("Registration Save Error:", error.message, error);
 
             // --- 1. HANDLE EXISTING REGISTRATION (The Logged-in User Case) ---
@@ -976,7 +981,18 @@ function Register() {
                                     <div><label className="block text-sm font-medium text-slate-700">City *</label><input type="text" value={individualRunner.city} onChange={e => handleIndividualChange('city', e.target.value)} className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm" required /></div>
                                     <div><label className="block text-sm font-medium text-slate-700">State *</label><select value={individualRunner.state} onChange={e => handleIndividualChange('state', e.target.value)} className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm bg-white" required><option value="">Select state</option>{statesInIndia.map(s => <option key={s} value={s}>{s}</option>)}</select></div>
                                     <div><label className="block text-sm font-medium text-slate-700">Pincode *</label><input type="text" maxLength="6" value={individualRunner.pincode} onChange={e => handleIndividualChange('pincode', e.target.value)} onKeyPress={handleNumberKeyPress} className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm" required /></div>
-                                    <div><label className="block text-sm font-medium text-slate-700">Country *</label><input type="text" value={individualRunner.country} className="w-full rounded-xl border bg-slate-50 px-3 py-2 text-sm" disabled /></div>
+                                    {/* <div><label className="block text-sm font-medium text-slate-700">Country *</label><input type="text" value={individualRunner.country} className="w-full rounded-xl border bg-slate-50 px-3 py-2 text-sm" disabled /></div> */}
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-700">Country *</label>
+                                        <input
+                                            type="text"
+                                            value={individualRunner.country}
+                                            onChange={e => handleIndividualChange('country', e.target.value)} // Enable typing
+                                            className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm shadow-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/50"
+                                            placeholder="Enter your country"
+                                            required
+                                        />
+                                    </div>
                                 </div>
                             </div>
 
