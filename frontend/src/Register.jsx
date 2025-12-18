@@ -1,5 +1,7 @@
 ﻿﻿// C:\Users\abhis\OneDrive\Desktop\SOFTWARE_DEVELOPER_LEARNING\marathon_project\frontend\src\Register.jsx - FINAL STABLE VERSION
 
+// changed getPlatformFee   raceCategories
+
 import React, { useState, useEffect } from "react";
 import { RACE_PRICING } from "./constants/racePricing";
 import { useNavigate } from "react-router-dom";
@@ -77,7 +79,8 @@ const getFilteredSizes = (gender) => {
 const getPlatformFee = (raceId) => {
     switch (raceId) {
         case "5k":
-            return 25;
+            return 1; // Changed from 25 to 0 for live testing
+            // return 25;
         case "10k":
             return 30;
         case "half":
@@ -91,7 +94,9 @@ const getPlatformFee = (raceId) => {
 };
 
 const raceCategories = [
-    { id: "5k", name: "5K Fun Run", description: "Perfect for beginners", regularPrice: 1200, prebookPrice: 1000, charityFee: 1600 },
+    // Change charityFee from 1600 to 0.1 for live testing
+    // { id: "5k", name: "5K Fun Run", description: "Perfect for beginners", regularPrice: 1200, prebookPrice: 1000, charityFee: 1600 },
+    { id: "5k", name: "5K Fun Run", description: "Perfect for beginners", regularPrice: 1200, prebookPrice: 1000, charityFee: 1 },
     { id: "10k", name: "10K Challenge", description: "Step up your game", regularPrice: 1700, prebookPrice: 1500, charityFee: 2500 },
     { id: "half", name: "Half Marathon (21.097K)", description: "The classic distance (21.1K)", regularPrice: 2500, prebookPrice: 2200, charityFee: 2800 },
     { id: "35k", name: "35K Ultra", description: "Push your limits", regularPrice: 2700, prebookPrice: 2500, charityFee: 3500 },
@@ -215,11 +220,11 @@ const INITIAL_INDIVIDUAL_STATE = {
     referralCode: "", referralPoints: "", idType: "", idNumber: "", idFile: null,
 };
 
-const INITIAL_GROUP_STATE = [{
+const INITIAL_GROUP_STATE = Array.from({ length: 5 }, () => ({
     firstName: "", lastName: "", email: "", phone: "", gender: "", tshirtSize: "",
     nationality: "", address: "", raceId: "", idType: "", idNumber: "",
     idFile: null, queryBox: ""
-}];
+}));
 
 function Register() {
     const { token, user } = useAuth();
