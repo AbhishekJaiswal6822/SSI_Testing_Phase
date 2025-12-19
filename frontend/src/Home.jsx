@@ -8,16 +8,20 @@ import PrizesRewards from "./PrizesRewards";
 import Sponsors from "./Sponsors";
 import CallToAction from "./CallToAction";
 import EventOverview from "./EventOverview";
+import ImageSlider from "./ImageSlider";
+import Hero from "./Hero";
 
 function Home() {
   return (
     <main className="w-full overflow-x-hidden">
-      <HeroSection />
+      <Hero />
+      {/* <HeroSection /> */}
       <EventCountdown />
       {/* <EventInformation />   */}
       {/* <RaceCategories />   */}
       <EventOverview />
       {/* <PrizesRewards /> */}
+      <ImageSlider />
       <Sponsors />
       <CallToAction />
     </main>
