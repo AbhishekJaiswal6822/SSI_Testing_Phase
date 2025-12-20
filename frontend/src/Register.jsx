@@ -14,7 +14,8 @@ import { toast } from 'react-toastify';
 const REGISTRATION_DATA_VERSION = "v1.0"; // Change this to "v1.1" when keys change
 
 // --- CONFIGURATION CONSTANTS ---
-const PG_FEE_RATE = 0.021; // 2.1% Payment Gateway Fee
+// const PG_FEE_RATE = 0.021; // 2.1% Payment Gateway Fee
+const PG_FEE_RATE = 0.025; // 2.1% Payment Gateway Fee
 const GST_RATE = 0.18;    // 18% GST (Applied only to PG Fee)
 // New Constant for Group Registration Limit
 const MAX_GROUP_MEMBERS = 35;
@@ -79,7 +80,7 @@ const getFilteredSizes = (gender) => {
 const getPlatformFee = (raceId) => {
     switch (raceId) {
         case "5k":
-            return 1; // Changed from 25 to 0 for live testing
+            return 25; // Changed from 25 to 0 for live testing
             // return 25;
         case "10k":
             return 30;
@@ -96,7 +97,7 @@ const getPlatformFee = (raceId) => {
 const raceCategories = [
     // Change charityFee from 1600 to 0.1 for live testing
     // { id: "5k", name: "5K Fun Run", description: "Perfect for beginners", regularPrice: 1200, prebookPrice: 1000, charityFee: 1600 },
-    { id: "5k", name: "5K Fun Run", description: "Perfect for beginners", regularPrice: 1200, prebookPrice: 1000, charityFee: 1 },
+    { id: "5k", name: "5K Fun Run", description: "Perfect for beginners", regularPrice: 1200, prebookPrice: 1000, charityFee: 1600 },
     { id: "10k", name: "10K Challenge", description: "Step up your game", regularPrice: 1700, prebookPrice: 1500, charityFee: 2500 },
     { id: "half", name: "Half Marathon (21.097K)", description: "The classic distance (21.1K)", regularPrice: 2500, prebookPrice: 2200, charityFee: 2800 },
     { id: "35k", name: "35K Ultra", description: "Push your limits", regularPrice: 2700, prebookPrice: 2500, charityFee: 3500 },
@@ -125,7 +126,7 @@ const statesInIndia = [
     "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal",
 ];
 const nationalitiesISO = [
-    "Afghan", "Albanian", "Algerian", "American", "Andorran", "Angolan", "Argentine", "Armenian", "Australian", "Austrian", "Azerbaijani", "Bangladeshi", "Belarusian", "Belgian", "Bhutanese", "Bolivian", "Brazilian", "British", "Bulgarian", "Cambodian", "Cameroonian", "Canadian", "Chilean", "Chinese", "Colombian", "Costa Rican", "Croatian", "Cuban", "Cypriot", "Czech", "Danish", "Dominican", "Dutch", "Egyptian", "Emirati", "Estonian", "Ethiopian", "Finnish", "French", "Georgian", "German", "Greek", "Hungarian", "Icelandic", "Indian", "Indonesian", "Iranian", "Iraqi", "Irish", "Israeli", "Italian", "Japanese", "Jordanian", "Kenyan", "Kuwaiti", "Latvian", "Lebanese", "Lithuanian", "Luxembourgish", "Malaysian", "Mexican", "Mongolian", "Moroccan", "Nepalese", "New Zealander", "Nigerian", "Norwegian", "Omani", "Pakistani", "Peruvian", "Philippine", "Polish", "Portuguese", "Qatari", "Romanian", "Russian", "Saudi Arabian", "Singaporean", "Slovak", "Slovenian", "South African", "South Korean", "Spanish", "Sri Lankan", "Swedish", "Swiss", "Thai", "Turkish", "Ukrainian", "Uruguayan", "Vietnamese", "Zambian", "Zimbabwean"
+    "Afghan", "Albanian", "Algerian", "American", "Andorran", "Angolan", "Argentine", "Armenian", "Australian", "Austrian", "Azerbaijani", "Bangladeshi", "Belarusian", "Belgian", "Bhutanese", "Bolivian", "Brazilian", "British", "Bulgarian", "Cambodian", "Cameroonian", "Canadian", "Chilean", "Chinese", "Colombian", "Costa Rican", "Croatian", "Cuban", "Cypriot", "Czech", "Danish", "Dominican", "Dutch", "Egyptian", "Emirati", "Estonian", "Ethiopian", "Finnish", "French", "Georgian", "German", "Greek", "Hungarian", "Icelandic", "India", "Indonesian", "Iranian", "Iraqi", "Irish", "Israeli", "Italian", "Japanese", "Jordanian", "Kenyan", "Kuwaiti", "Latvian", "Lebanese", "Lithuanian", "Luxembourgish", "Malaysian", "Mexican", "Mongolian", "Moroccan", "Nepalese", "New Zealander", "Nigerian", "Norwegian", "Omani", "Pakistani", "Peruvian", "Philippine", "Polish", "Portuguese", "Qatari", "Romanian", "Russian", "Saudi Arabian", "Singaporean", "Slovak", "Slovenian", "South African", "South Korean", "Spanish", "Sri Lankan", "Swedish", "Swiss", "Thai", "Turkish", "Ukrainian", "Uruguayan", "Vietnamese", "Zambian", "Zimbabwean"
 ];
 
 // --- T-Shirt Size Popover Component (MOBILE STYLING FIXED) ---
