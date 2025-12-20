@@ -81,7 +81,7 @@ const getPlatformFee = (raceId) => {
     switch (raceId) {
         case "5k":
             return 25; // Changed from 25 to 0 for live testing
-            // return 25;
+        // return 25;
         case "10k":
             return 30;
         case "half":
@@ -278,7 +278,7 @@ function Register() {
     // --- END AUTO-SAVE CODE ---
 
     // --- MODIFIED STATE FOR POPOVER (Unchanged) ---
-    
+
     const toggleSizeChart = (id) => {
         setOpenPopoverId(prevId => prevId === id ? null : id);
     };
@@ -303,12 +303,12 @@ function Register() {
 
 
     // --- Group State (UPDATED: Added queryBox) ---
-    
+
     // Keep ONLY this one version
-    
+
 
     // State for Individual Registration fields (Unchanged)
-    
+
     React.useEffect(() => {
         const { idFile, ...dataToSave } = individualRunner;
         localStorage.setItem("temp_individual_runner", JSON.stringify(dataToSave));
@@ -338,7 +338,7 @@ function Register() {
         });
     };
 
-    
+
 
     // Helper functions (UPDATED: Added queryBox)
     const newMemberObject = () => ({
@@ -1537,11 +1537,10 @@ function Register() {
                         <div className="mt-5 text-sm text-slate-600">
                             <p className="font-semibold mb-2">Registration fee includes:</p>
                             <ul className="list-disc list-inside space-y-1">
-                                <li>Race kit with participant bib</li>
-                                <li>Event t-shirt</li>
+                                <li>Race Kit (Participant Bib & Official Event T-Shirt)</li>
                                 <li>Finisher medal</li>
-                                <li>Refreshments during race</li>
-                                <li>Digital certificate</li>
+                                <li>Refreshments During the Race</li>
+                                <li>Digital Certificate</li>
                             </ul>
                         </div>
 
