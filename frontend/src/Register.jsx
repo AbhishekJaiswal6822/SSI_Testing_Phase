@@ -499,8 +499,17 @@ function Register() {
 
         // STEP 2: Calculate Platform Fee
         const currentRaceId = selectedRace?.id || (groupMembers.length > 0 ? groupMembers[0].raceId : null);
-        if (currentRaceId) {
-            platformFee = getPlatformFee(currentRaceId) * (registrationType === 'group' ? memberCount : 1); // Apply PF per member for group
+        if (registrationType === 'group') {
+            // Sums individual platform fees for every group member based on their specific race
+            platformFee = groupMembers.reduce((sum, member) => {
+                return sum + getPlatformFee(member.raceId);
+            }, 0);
+        } else {
+            // Individual and Charity logic remains untouched
+            const currentRaceId = selectedRace?.id;
+            if (currentRaceId) {
+                platformFee = getPlatformFee(currentRaceId);
+            }
         }
 
         // STEP 3: Calculate Subtotal before PG/GST (RegFeeNet + PF)
