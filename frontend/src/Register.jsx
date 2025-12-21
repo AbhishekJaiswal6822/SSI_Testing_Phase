@@ -354,9 +354,18 @@ function Register() {
             setGroupMembers((prev) => [...prev, newMemberObject(),]);
         } else {
             // Toast message for exceeding the standard limit
-            toast.error(`Group limit reached (${MAX_GROUP_MEMBERS} members). Contact us to become a community partner.`, {
-                toastId: 'group-limit-error-add', // Added specific ID
-            });
+            // toast.error(`Group limit reached (${MAX_GROUP_MEMBERS} members). Contact us to become a community partner.`, {
+            //     toastId: 'group-limit-error-add', // Added specific ID
+            // });
+            toast.error(
+                <span>
+                    Registration 35+ MEMBERS?<br />
+                    📩 Email on registration@sprintssagaindia.com to become a Community Partner
+                </span>,
+                {
+                    toastId: 'group-limit-error-add',
+                }
+            );
             scrollToField('group-limit-message');
         }
     };
@@ -379,11 +388,19 @@ function Register() {
 
         // 4. Show toast if user tries to exceed 35
         if (parsedCount > MAX_GROUP_MEMBERS) {
-            toast.error(`Group limit is ${MAX_GROUP_MEMBERS} members.`, {
-                toastId: 'group-limit-error-input',
-                autoClose: 5000,
-                pauseOnFocusLoss: false,
-            });
+            // toast.error(`Group limit is ${MAX_GROUP_MEMBERS} members.`, {
+            toast.error(
+                <span>
+                    Registration 35+ MEMBERS?<br />
+                    📩 Email on registration@sprintssagaindia.com to become a Community Partner
+                </span>,
+                {
+                    toastId: 'group-limit-error-input',
+                    style: { width: "400px" }, // Forces the box to be wider
+                    autoClose: 5000,
+                    pauseOnFocusLoss: false,
+                }
+            );
         }
 
         setGroupMembers((prev) => {
