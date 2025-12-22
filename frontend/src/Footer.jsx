@@ -49,7 +49,7 @@ function Footer() {
               {/* EMAIL */}
               <div>
                 <h5 className="text-white font-medium mb-1">Email Us</h5>
-                <p className="text-sm">info.desk@sprintssagaindia.com</p>
+                <p className="text-sm">info@sprintssagaindia.com</p>
 
                 <h5 className="text-white font-medium mt-2 mb-1">
                   Bulk Registration
