@@ -66,7 +66,7 @@ function Footer() {
                     href="https://www.instagram.com/sprintssagaindia"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-3 hover:text-pink-500 transition"
+                    className="flex items-center gap-3 hover:text-pink-500 active:text-pink-600 transition duration-300"
                   >
                     <FaInstagram size={18} />
                     <span className="text-sm">sprintssagaindia</span>
@@ -76,7 +76,7 @@ function Footer() {
                     href="https://www.facebook.com/SprintsSagaIndia"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-3 hover:text-blue-500 transition"
+                    className="flex items-center gap-3 hover:text-blue-500 active:text-blue-600 transition duration-300"
                   >
                     <FaFacebookF size={16} />
                     <span className="text-sm">Sprints Saga India</span>
