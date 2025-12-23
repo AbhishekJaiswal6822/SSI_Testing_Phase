@@ -33,7 +33,7 @@ function Navbar() {
     { key: "raceday", label: "Race Day", to: "/raceday" },
     { key: "results", label: "Results & Gallery", to: "/results" },
     { key: "dashboard", label: "Dashboard", to: "/dashboard" },
-    { key: "admin", label: "Admin", to: "/admin" },
+    // { key: "admin", label: "Admin", to: "/admin" },
   ];
 
   const toggle = () => setOpen((v) => !v);
