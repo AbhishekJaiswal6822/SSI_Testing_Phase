@@ -6,8 +6,8 @@ const generateInvoiceHTML = require('../templates/invoiceTemplate');
 // 1. Configure the "Sender" (Your Gmail)
 const transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
-    port: 587,
-    secure: false,
+    port: 465,
+    secure: true,
     auth: {
         user: 'sprintsagaindia@gmail.com',
         pass: 'mstplrauewjyulsa' // We will get this in Step 3
