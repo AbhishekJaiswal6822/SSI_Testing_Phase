@@ -26,6 +26,12 @@ const RunnerDetailsSchema = new mongoose.Schema({
     finishTime: { type: String },
     dietary: { type: String },
     tshirtSize: { type: String, required: true },
+    registrationFee: { type: Number, default: 0 },
+    discountAmount: { type: Number, default: 0 },
+    platformFee: { type: Number, default: 0 },
+    pgFee: { type: Number, default: 0 },
+    gstAmount: { type: Number, default: 0 },
+    amount: { type: Number, required: true }, // Total paid
 });
 
 const IDProofSchema = new mongoose.Schema({

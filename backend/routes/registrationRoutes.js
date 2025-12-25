@@ -16,5 +16,4 @@ router.post(
   registrationController.submitRegistration
 );
 
-
 module.exports = router;

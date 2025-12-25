@@ -19,6 +19,7 @@ const app = express();
 const PORT = process.env.PORT || 8000;
 const MONGO_URI = process.env.MONGO_URI; 
 
+
 const allowedOrigins = [
   'http://localhost:5173', 
   'http://127.0.0.1:5173',
@@ -28,6 +29,8 @@ const allowedOrigins = [
   'https://www.sprintssagaindia.com',   // Your www subdomain
   /\.amplifyapp\.com$/                 // Allows all AWS Amplify preview URLs
 ];
+
+const { sendInvoiceEmail } = require('./services/emailService');
 
 // --- CRITICAL MIDDLEWARE ORDER ---
 
