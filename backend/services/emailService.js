@@ -1,3 +1,4 @@
+// Updated on Dec 26 for AWS Deployment
 const nodemailer = require('nodemailer');
 const html_pdf = require('html-pdf-node');
 const generateInvoiceHTML = require('../templates/invoiceTemplate');
