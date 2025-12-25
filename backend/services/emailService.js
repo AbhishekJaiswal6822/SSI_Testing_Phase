@@ -9,7 +9,7 @@ const transporter = nodemailer.createTransport({
     secure: false,
     auth: {
         user: 'sprintsagaindia@gmail.com',
-        pass: 'mstp lrau ewjy ulsa' // We will get this in Step 3
+        pass: 'mstplrauewjyulsa' // We will get this in Step 3
     },
     tls: {
         rejectUnauthorized: false
