@@ -157,6 +157,84 @@ exports.createOrder = async (req, res) => {
 //     }
 // };
 
+// exports.verifyPayment = async (req, res) => {
+//     const { razorpay_order_id, razorpay_payment_id, razorpay_signature, registrationId } = req.body;
+
+//     if (!razorpay_payment_id || !registrationId) {
+//         return res.status(400).json({ success: false, message: 'Missing payment details.' });
+//     }
+
+//     try {
+//         const registration = await Registration.findById(registrationId);
+//         if (!registration) return res.status(404).json({ success: false, message: 'Registration not found.' });
+//         if (registration.registrationStatus === 'Verified') {
+//             return res.status(400).json({ success: false, message: 'Payment already completed' });
+//         }
+
+//         // --- NEW: Fetch Payment Mode from Razorpay API ---
+//         let paymentMethod = 'ONLINE';
+//         try {
+//             const paymentInstance = await razorpayInstance.payments.fetch(razorpay_payment_id);
+//             paymentMethod = paymentInstance.method.toUpperCase(); // e.g., 'UPI', 'CARD'
+//         } catch (fetchError) {
+//             console.error("⚠️ Could not fetch payment method, defaulting to ONLINE");
+//         }
+
+//         // ✅ Update registration status and payment details
+//         registration.registrationStatus = 'Verified';
+//         registration.paymentDetails = {
+//             orderId: razorpay_order_id,
+//             paymentId: razorpay_payment_id,
+//             signature: razorpay_signature,
+//             status: 'success',
+//             paidAt: new Date(),
+//         };
+//         await registration.save();
+
+//         // ✅ Prepare Invoice Data with Personal Info & Mode
+//         try {
+//             const invoiceData = {
+//                 firstName: registration.runnerDetails?.firstName || "Runner",
+//                 lastName: registration.runnerDetails?.lastName || "",
+//                 fullName: registration.runnerDetails
+//                     ? `${registration.runnerDetails.firstName} ${registration.runnerDetails.lastName}`
+//                     : "Valued Runner",
+//                 phone: registration.runnerDetails?.phone || "N/A",
+//                 email: registration.runnerDetails?.email || userEmail,
+//                 raceCategory: registration.raceCategory,
+//                 paymentMode: paymentMethod,
+//                 invoiceNo: `LRCP-${registration.raceCategory}-${Date.now().toString().slice(-4)}`,
+
+//                 // FIX: Check BOTH registration root and runnerDetails for the amounts
+//                 // This ensures Group registrations (root) and Individual (nested) both work
+//                 rawRegistrationFee: registration.rawRegistrationFee || registration.runnerDetails?.registrationFee || 0,
+//                 discountAmount: registration.discountAmount || registration.runnerDetails?.discountAmount || 0,
+//                 platformFee: registration.platformFee || registration.runnerDetails?.platformFee || 0,
+//                 pgFee: registration.pgFee || registration.runnerDetails?.pgFee || 0,
+//                 gstAmount: registration.gstAmount || registration.runnerDetails?.gstAmount || 0,
+//                 amount: registration.amount || registration.runnerDetails?.amount || 0
+//             };
+
+//             sendInvoiceEmail(registration.runnerDetails?.email || userEmail, invoiceData)
+//                 .then(() => console.log(`✅ Invoice ${invoiceData.invoiceNo} sent successfully with amount: ${invoiceData.amount}`))
+//                 .catch(err => console.error("❌ Email failed:", err));
+
+//         } catch (emailDataError) {
+//             console.error("❌ Error preparing invoice data:", emailDataError.message);
+//         }
+
+//         return res.status(200).json({
+//             success: true,
+//             message: 'Payment verified successfully. Registration complete!',
+//             registrationId,
+//         });
+
+//     } catch (error) {
+//         console.error('Payment Verification Error:', error);
+//         return res.status(500).json({ success: false, message: 'Payment verification failed.' });
+//     }
+// };
+
 exports.verifyPayment = async (req, res) => {
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature, registrationId } = req.body;
 
@@ -171,16 +249,16 @@ exports.verifyPayment = async (req, res) => {
             return res.status(400).json({ success: false, message: 'Payment already completed' });
         }
 
-        // --- NEW: Fetch Payment Mode from Razorpay API ---
+        // 1. Get Payment Method
         let paymentMethod = 'ONLINE';
         try {
             const paymentInstance = await razorpayInstance.payments.fetch(razorpay_payment_id);
-            paymentMethod = paymentInstance.method.toUpperCase(); // e.g., 'UPI', 'CARD'
+            paymentMethod = paymentInstance.method.toUpperCase(); 
         } catch (fetchError) {
-            console.error("⚠️ Could not fetch payment method, defaulting to ONLINE");
+            console.error("⚠️ Could not fetch payment method");
         }
 
-        // ✅ Update registration status and payment details
+        // 2. Update Status
         registration.registrationStatus = 'Verified';
         registration.paymentDetails = {
             orderId: razorpay_order_id,
@@ -191,36 +269,39 @@ exports.verifyPayment = async (req, res) => {
         };
         await registration.save();
 
-        // ✅ Prepare Invoice Data with Personal Info & Mode
+        // 3. Prepare Invoice Data (Mapped directly to your runnerDetails storage)
         try {
+            // Shorthand to access nested fields confirmed in your Registration.js model
+            const runner = registration.runnerDetails; 
+
             const invoiceData = {
-                firstName: registration.runnerDetails?.firstName || "Runner",
-                lastName: registration.runnerDetails?.lastName || "",
-                fullName: registration.runnerDetails
-                    ? `${registration.runnerDetails.firstName} ${registration.runnerDetails.lastName}`
-                    : "Valued Runner",
-                phone: registration.runnerDetails?.phone || "N/A",
-                email: registration.runnerDetails?.email || userEmail,
+                firstName: runner.firstName,
+                lastName: runner.lastName,
+                fullName: `${runner.firstName} ${runner.lastName}`,
+                phone: runner.phone,
+                email: runner.email,
                 raceCategory: registration.raceCategory,
                 paymentMode: paymentMethod,
                 invoiceNo: `LRCP-${registration.raceCategory}-${Date.now().toString().slice(-4)}`,
 
-                // FIX: Check BOTH registration root and runnerDetails for the amounts
-                // This ensures Group registrations (root) and Individual (nested) both work
-                rawRegistrationFee: registration.rawRegistrationFee || registration.runnerDetails?.registrationFee || 0,
-                discountAmount: registration.discountAmount || registration.runnerDetails?.discountAmount || 0,
-                platformFee: registration.platformFee || registration.runnerDetails?.platformFee || 0,
-                pgFee: registration.pgFee || registration.runnerDetails?.pgFee || 0,
-                gstAmount: registration.gstAmount || registration.runnerDetails?.gstAmount || 0,
-                amount: registration.amount || registration.runnerDetails?.amount || 0
+                // 💰 Corrected Mapping to match your registrationController save logic
+                rawRegistrationFee: runner.registrationFee || 0,
+                discountAmount: runner.discountAmount || 0,
+                platformFee: runner.platformFee || 0,
+                pgFee: runner.pgFee || 0,
+                gstAmount: runner.gstAmount || 0,
+                amount: runner.amount || 0 // This captures the ₹1.04 paid amount
             };
 
-            sendInvoiceEmail(registration.runnerDetails?.email || userEmail, invoiceData)
-                .then(() => console.log(`✅ Invoice ${invoiceData.invoiceNo} sent successfully with amount: ${invoiceData.amount}`))
-                .catch(err => console.error("❌ Email failed:", err));
+            // SYSTEM LOG: Verify the mapping in your AWS logs
+            console.log(`[INVOICE-SYSTEM] Preparing email for ${invoiceData.email}. Amount Detected: ${invoiceData.amount}`);
+
+            // Send Email
+            await sendInvoiceEmail(runner.email, invoiceData);
+            console.log(`✅ Invoice ${invoiceData.invoiceNo} sent successfully.`);
 
         } catch (emailDataError) {
-            console.error("❌ Error preparing invoice data:", emailDataError.message);
+            console.error("❌ Error during invoice generation:", emailDataError.message);
         }
 
         return res.status(200).json({
