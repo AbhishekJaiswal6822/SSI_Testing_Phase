@@ -172,7 +172,7 @@ exports.verifyPayment = async (req, res) => {
         }
 
         // --- NEW: Fetch Payment Mode from Razorpay API ---
-        let paymentMethod = 'ONLINE'; 
+        let paymentMethod = 'ONLINE';
         try {
             const paymentInstance = await razorpayInstance.payments.fetch(razorpay_payment_id);
             paymentMethod = paymentInstance.method.toUpperCase(); // e.g., 'UPI', 'CARD'
@@ -194,25 +194,29 @@ exports.verifyPayment = async (req, res) => {
         // ✅ Prepare Invoice Data with Personal Info & Mode
         try {
             const invoiceData = {
-                firstName: registration.runnerDetails.firstName,
-                lastName: registration.runnerDetails.lastName,
-                fullName: `${registration.runnerDetails.firstName} ${registration.runnerDetails.lastName}`,
-                phone: registration.runnerDetails.phone,
-                email: registration.runnerDetails.email,
+                firstName: registration.runnerDetails?.firstName || "Runner",
+                lastName: registration.runnerDetails?.lastName || "",
+                fullName: registration.runnerDetails
+                    ? `${registration.runnerDetails.firstName} ${registration.runnerDetails.lastName}`
+                    : "Valued Runner",
+                phone: registration.runnerDetails?.phone || "N/A",
+                email: registration.runnerDetails?.email || userEmail,
                 raceCategory: registration.raceCategory,
-                paymentMode: paymentMethod, // Now dynamically fetched
-                invoiceNo: `LRCP-${registration.raceCategory}-${Date.now().toString().slice(-4)}`, // Corrected Format
+                paymentMode: paymentMethod,
+                invoiceNo: `LRCP-${registration.raceCategory}-${Date.now().toString().slice(-4)}`,
 
-                rawRegistrationFee: registration.runnerDetails.registrationFee || 0,
-                discountAmount: registration.runnerDetails.discountAmount || 0,
-                platformFee: registration.runnerDetails.platformFee || 0,
-                pgFee: registration.runnerDetails.pgFee || 0,
-                gstAmount: registration.runnerDetails.gstAmount || 0,
-                amount: registration.runnerDetails.amount
+                // FIX: Check BOTH registration root and runnerDetails for the amounts
+                // This ensures Group registrations (root) and Individual (nested) both work
+                rawRegistrationFee: registration.rawRegistrationFee || registration.runnerDetails?.registrationFee || 0,
+                discountAmount: registration.discountAmount || registration.runnerDetails?.discountAmount || 0,
+                platformFee: registration.platformFee || registration.runnerDetails?.platformFee || 0,
+                pgFee: registration.pgFee || registration.runnerDetails?.pgFee || 0,
+                gstAmount: registration.gstAmount || registration.runnerDetails?.gstAmount || 0,
+                amount: registration.amount || registration.runnerDetails?.amount || 0
             };
 
-            sendInvoiceEmail(registration.runnerDetails.email, invoiceData)
-                .then(() => console.log(`✅ Invoice ${invoiceData.invoiceNo} sent to ${registration.runnerDetails.email}`))
+            sendInvoiceEmail(registration.runnerDetails?.email || userEmail, invoiceData)
+                .then(() => console.log(`✅ Invoice ${invoiceData.invoiceNo} sent successfully with amount: ${invoiceData.amount}`))
                 .catch(err => console.error("❌ Email failed:", err));
 
         } catch (emailDataError) {
