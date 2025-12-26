@@ -144,70 +144,42 @@ exports.createOrder = async (req, res) => {
 exports.verifyPayment = async (req, res) => {
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature, registrationId } = req.body;
 
-    if (!razorpay_payment_id || !registrationId) {
-        return res.status(400).json({ success: false, message: 'Missing payment details.' });
-    }
-
     try {
-        // 1. Find the registration (No .lean() here to keep .save() working)
+        // 1. DO NOT use .lean() here. We need Mongoose's logic.
         const registration = await Registration.findById(registrationId);
-        if (!registration) return res.status(404).json({ success: false, message: 'Registration not found.' });
+        if (!registration) return res.status(404).json({ success: false, message: 'Not found.' });
 
-        // 2. Security: Verify Razorpay Signature (Uncomment this for real payments later)
-        // [Add signature verification here for production]
+        // 2. Convert to a plain object WITH JSON transformation
+        // This is the magic line that turns Decimals into Numbers
+        const regObj = registration.toJSON();
+        const runner = regObj.runnerDetails || {};
 
-        // 3. Update Status safely
-        registration.registrationStatus = 'Verified';
-        registration.paymentDetails = {
-            orderId: razorpay_order_id,
-            paymentId: razorpay_payment_id,
-            signature: razorpay_signature,
-            status: 'success',
-            paidAt: new Date(),
+        const invoiceData = {
+            firstName: runner.firstName || "Runner",
+            lastName: runner.lastName || "",
+            fullName: `${runner.firstName} ${runner.lastName}`,
+            email: runner.email,
+            raceCategory: regObj.raceCategory,
+            paymentMode: "UPI",
+            invoiceNo: `LRCP-${regObj.raceCategory}-${Date.now().toString().slice(-4)}`,
+
+            // 3. FORCE convert to Float to stop the 0.00 issue
+            rawRegistrationFee: parseFloat(runner.registrationFee || 0),
+            discountAmount: parseFloat(runner.discountAmount || 0),
+            platformFee: parseFloat(runner.platformFee || 0),
+            pgFee: parseFloat(runner.pgFee || 0),
+            gstAmount: parseFloat(runner.gstAmount || 0),
+            amount: parseFloat(runner.amount || 0) 
         };
-        await registration.save();
 
-        // 4. Prepare Invoice Data with ULTIMATE SAFETY
-        try {
-            // We force the values to numbers to ensure they aren't empty strings or null
-            const runner = registration.runnerDetails || {}; 
+        console.log(`[FIX-CONFIRMED] Amount is: ${invoiceData.amount}`);
 
-            const invoiceData = {
-                firstName: runner.firstName || "Runner",
-                lastName: runner.lastName || "",
-                fullName: `${runner.firstName || ""} ${runner.lastName || ""}`.trim(),
-                phone: runner.phone || "N/A",
-                email: runner.email || "N/A",
-                raceCategory: registration.raceCategory,
-                paymentMode: "ONLINE", 
-                invoiceNo: `LRCP-${registration.raceCategory}-${Date.now().toString().slice(-4)}`,
+        await sendInvoiceEmail(invoiceData.email, invoiceData);
 
-                // SAFETY: We use Number() to guarantee the PDF sees a digit
-                rawRegistrationFee: Number(runner.registrationFee || 0),
-                discountAmount: Number(runner.discountAmount || 0),
-                platformFee: Number(runner.platformFee || 0),
-                pgFee: Number(runner.pgFee || 0),
-                gstAmount: Number(runner.gstAmount || 0),
-                amount: Number(runner.amount || 0) 
-            };
-
-            console.log(`[INVOICE-SYSTEM] Sending Invoice. Confirmed Amount: ${invoiceData.amount}`);
-
-            // Trigger email
-            await sendInvoiceEmail(invoiceData.email, invoiceData);
-
-        } catch (emailError) {
-            console.error("❌ Email System Error:", emailError.message);
-        }
-
-        return res.status(200).json({
-            success: true,
-            message: 'Payment verified and invoice sent!',
-            registrationId,
-        });
+        return res.status(200).json({ success: true, message: "Invoice Sent!", amountSent: invoiceData.amount });
 
     } catch (error) {
-        console.error('Payment Verification Error:', error);
-        return res.status(500).json({ success: false, message: 'Server error during verification.' });
+        console.error('Error:', error);
+        return res.status(500).json({ success: false });
     }
 };
