@@ -2,8 +2,8 @@
 
 
 const Registration = require('../models/Registration');
-const multer = require('multer'); 
-const fs = require('fs'); 
+const multer = require('multer');
+const fs = require('fs');
 const path = require('path');
 
 // --- 1. Multer Storage Setup ---
@@ -20,7 +20,7 @@ const storage = multer.diskStorage({
 });
 
 // --- 2. Middleware Configuration ---
-exports.uploadIDProof = multer({ 
+exports.uploadIDProof = multer({
     storage: storage,
     limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
     fileFilter: (req, file, cb) => {
@@ -36,16 +36,17 @@ exports.uploadIDProof = multer({
 // --- 3. Unified Registration Logic ---
 exports.submitRegistration = async (req, res) => {
     try {
-        if (!req.file) {
-            return res.status(400).json({ success: false, message: 'ID Proof file is required.' });
-        }
-
-        // 🟢 FIX: Take everything from req.body
-        const data = req.body;
-
-        // 🟢 FIX: Handle 'dob' whether it's nested or flat (Since you aren't changing Register.jsx)
+        let data = req.body;
+        if (data.runnerDetails && typeof data.runnerDetails === 'string') {
+            try {
+                const nestedData = JSON.parse(data.runnerDetails);
+                data = { ...data, ...nestedData }; // Merge them so numbers are at the top
+            } catch (e) {
+                console.log("runnerDetails was not a JSON string, using raw body.");
+            }
+        }        // 🟢 FIX: Handle 'dob' whether it's nested or flat (Since you aren't changing Register.jsx)
         const rawDob = data.dob || (data.runnerDetails && JSON.parse(data.runnerDetails).dob);
-        
+
         if (!rawDob) {
             return res.status(400).json({ success: false, message: 'Date of Birth (dob) is required.' });
         }
@@ -55,32 +56,32 @@ exports.submitRegistration = async (req, res) => {
             registrationType: data.registrationType,
             raceCategory: data.raceCategory || data.raceId,
             runnerDetails: {
+                // Spread all data from body to capture firstName, lastName, phone, etc.
                 ...data,
-                dob: new Date(rawDob), 
-                // 🟢 FIX: Map 'rawRegistrationFee' and force Number type
-                registrationFee: Number(data.rawRegistrationFee) || 0, 
+                dob: new Date(rawDob),
+                registrationFee: Number(data.rawRegistrationFee || data.registrationFee) || 0,
                 discountAmount: Number(data.discountAmount) || 0,
                 platformFee: Number(data.platformFee) || 0,
                 pgFee: Number(data.pgFee) || 0,
                 gstAmount: Number(data.gstAmount) || 0,
-                amount: Number(data.amount) || 0 
+                amount: Number(data.amount) || 0
             },
             idProof: {
                 idType: data.idType,
                 idNumber: data.idNumber,
-                path: req.file.path 
+                path: req.file.path
             },
             registrationStatus: 'Pending Payment'
         });
 
         const savedRegistration = await registration.save();
-        
-        res.status(201).json({ 
-            success: true, 
+
+        res.status(201).json({
+            success: true,
             message: 'Registration saved! Proceed to payment.',
-            registrationId: savedRegistration._id 
+            registrationId: savedRegistration._id
         });
-        
+
     } catch (error) {
         if (req.file) { fs.unlinkSync(req.file.path); }
         console.error('Registration Error:', error.message);
