@@ -55,10 +55,16 @@ exports.submitRegistration = async (req, res) => {
             user: req.user.id,
             registrationType: data.registrationType,
             raceCategory: data.raceCategory || data.raceId,
+
+            // 🟢 CRITICAL FIX: Add these two lines at the TOP LEVEL
+            // This ensures the invoice generator finds them immediately.
+            registrationFee: Number(data.rawRegistrationFee || data.registrationFee) || 0,
+            amount: Number(data.amount) || 0,
+
             runnerDetails: {
-                // Spread all data from body to capture firstName, lastName, phone, etc.
-                ...data,
+                ...data, // Spread data first
                 dob: new Date(rawDob),
+                // Keep these here as well for redundancy
                 registrationFee: Number(data.rawRegistrationFee || data.registrationFee) || 0,
                 discountAmount: Number(data.discountAmount) || 0,
                 platformFee: Number(data.platformFee) || 0,
