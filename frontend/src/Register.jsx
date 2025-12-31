@@ -1122,11 +1122,11 @@ function Register() {
 
                                 {/* Referral Code Box */}
                                 <div className="mt-4 p-6 bg-teal-50/30 rounded-2xl border border-teal-100">
-                                    <h3 className="flex items-center gap-2 text-sm font-bold text-slate-900">🎁 Referral Code</h3>
+                                    <h3 className="flex items-center gap-2 text-sm font-bold text-slate-900">🎁 Referral/Coupon Code</h3>
                                     <p className="text-xs text-slate-500 mt-1">Have a referral code? Enter it here to earn bonus points!</p>
                                     <input
                                         type="text"
-                                        placeholder="Enter referral code"
+                                        placeholder="Enter referral/coupon code"
                                         // Ensure this is 'referralCode' (two 'r's)
                                         value={individualRunner.referralCode}
                                         // Ensure this string matches exactly
