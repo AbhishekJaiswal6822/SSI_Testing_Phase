@@ -1,6 +1,4 @@
-
-
-// Updated on Dec 26 for AWS Deployment - Tightened Layout & Fixed Encoding
+//backend\services\emailService.js
 const path = require('path');
 const PDFDocument = require('pdfkit');
 const nodemailer = require('nodemailer');
@@ -12,7 +10,7 @@ const transporter = nodemailer.createTransport({
     secure: true,
     auth: {
         user: 'sprintsagaindia@gmail.com',
-        pass: 'mstplrauewjyulsa' 
+        pass: 'mstplrauewjyulsa'
     },
     tls: {
         rejectUnauthorized: false
@@ -45,8 +43,8 @@ const sendInvoiceEmail = async (userEmail, paymentData) => {
 
             // --- LOGO SECTION ---
             // This pulls the logo from your backend/assets folder
-            const logoPath = path.join(__dirname, '../assets/logo.jpg'); 
-            doc.image(logoPath, 260, 35, { width: 75 }); 
+            const logoPath = path.join(__dirname, '../assets/logo.jpg');
+            doc.image(logoPath, 260, 35, { width: 75 });
             doc.moveDown(5); // Space for the logo
 
             // --- HEADER & TITLE ---
@@ -85,7 +83,7 @@ const sendInvoiceEmail = async (userEmail, paymentData) => {
             let currentY = tableTop + 22;
             const drawItem = (label, value, isRed = false) => {
                 doc.font('Helvetica').fillColor(isRed ? '#e60000' : '#333333').text(label, 50, currentY);
-                
+
                 // --- THE ULTIMATE TYPE SAFETY FIX ---
                 let cleanValue = 0;
                 if (typeof value === 'number') {
@@ -99,7 +97,7 @@ const sendInvoiceEmail = async (userEmail, paymentData) => {
 
                 const amountText = Math.abs(cleanValue).toFixed(2);
                 doc.text(`Rs. ${amountText}`, 450, currentY, { width: 90, align: 'right' });
-                
+
                 doc.moveTo(40, currentY + 12).lineTo(555, currentY + 12).strokeColor('#eeeeee').lineWidth(0.5).stroke();
                 currentY += 18;
             };
@@ -114,7 +112,7 @@ const sendInvoiceEmail = async (userEmail, paymentData) => {
             // --- TOTAL PAID HIGHLIGHT ---
             doc.rect(40, currentY, 515, 22).fill('#f0f9f9'); // Light teal background
             doc.fillColor('#008080').font('Helvetica-Bold').fontSize(10).text('TOTAL PAID', 50, currentY + 6);
-            
+
             // FIXED: Using "Rs." here as well
             const totalText = Number(paymentData.amount).toFixed(2);
             doc.text(`Rs. ${totalText}`, 450, currentY + 6, { width: 90, align: 'right' });
@@ -124,7 +122,7 @@ const sendInvoiceEmail = async (userEmail, paymentData) => {
 
             // Darker text color (#444444 instead of #999999)
             doc.fillColor('#444444').fontSize(7.5).font('Helvetica-Oblique');
-            
+
             // Sequential points with tighter vertical spacing (+7.5)
             doc.text('* GST is applicable only on the Payment Gateway Fee', 50, doc.y, { align: 'left' });
             doc.text('* No GST is charged on Registration or Platform Fee', 50, doc.y + 7.5, { align: 'left' });
@@ -137,18 +135,30 @@ const sendInvoiceEmail = async (userEmail, paymentData) => {
                 .lineWidth(0.5)
                 .stroke();
 
-            doc.moveDown(2); // Tightened space below line
+            const footerStartY = doc.y + 30;
 
-            // Organization Name (Darkest color #111111)
+            // Separator line
+            doc.moveTo(40, footerStartY)
+                .lineTo(555, footerStartY)
+                .strokeColor('#dddddd')
+                .lineWidth(0.5)
+                .stroke();
+
+            // Organization Name
             doc.fillColor('#111111')
                 .fontSize(9)
                 .font('Helvetica-Bold')
-                .text('Sprints Saga India', 50, doc.y + 10, { align: 'left' });
+                .text('Sprints Saga India', 50, footerStartY + 12);
 
-            // Contact Details (Teal Color)
+            // Contact Details
             doc.fillColor('#008080')
                 .font('Helvetica')
-                .text('info@sprintssagaindia.com | www.sprintssagaindia.com', 50, doc.y + 2, { align: 'left' });
+                .text(
+                    'info@sprintssagaindia.com | www.sprintssagaindia.com',
+                    50,
+                    footerStartY + 26
+                );
+
 
             doc.end();
         } catch (error) {
