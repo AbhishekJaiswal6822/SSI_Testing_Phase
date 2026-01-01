@@ -128,13 +128,6 @@ const sendInvoiceEmail = async (userEmail, paymentData) => {
             doc.text('* No GST is charged on Registration or Platform Fee', 50, doc.y + 7.5, { align: 'left' });
             doc.text('* This is a system-generated invoice', 50, doc.y + 15, { align: 'left' });
 
-            // Decorative Separator Line moved much closer (y + 24)
-            doc.moveTo(40, doc.y + 24)
-                .lineTo(555, doc.y + 24)
-                .strokeColor('#dddddd')
-                .lineWidth(0.5)
-                .stroke();
-
             const footerStartY = doc.y + 30;
 
             // Separator line
