@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { api } from "../api";
 import { useAuth } from "../AuthProvider";
@@ -24,8 +24,6 @@ function PaymentPage() {
   const navigate = useNavigate();
   const { token } = useAuth();
   const [loading, setLoading] = useState(false);
-  const paymentDoneRef = useRef(false);
-
 
   const {
     amount = 0,
@@ -46,7 +44,6 @@ function PaymentPage() {
   }
 
   const verifyPayment = async (paymentDetails) => {
-    if (paymentDoneRef.current) return;
     try {
       const response = await api("/api/payment/verify", {
         method: "POST",
@@ -57,15 +54,7 @@ function PaymentPage() {
         token,
       });
 
-      // if (response.success) {
-      //   navigate("/payment-success", {
-      //     replace: true,
-      //     state: { registrationId },
-      //   });
-      // }
       if (response.success) {
-        paymentDoneRef.current = true;
-
         navigate("/payment-success", {
           replace: true,
           state: { registrationId },
@@ -137,11 +126,6 @@ function PaymentPage() {
       setLoading(false);
     }
   };
-
-  if (paymentDoneRef.current) {
-  return null;
-}
-
 
   return (
     <main className="min-h-screen bg-slate-50 flex justify-center items-center px-4">
