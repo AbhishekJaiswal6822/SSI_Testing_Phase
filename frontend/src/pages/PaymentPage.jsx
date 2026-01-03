@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { api } from "../api";
 import { useAuth } from "../AuthProvider";
@@ -24,6 +24,8 @@ function PaymentPage() {
   const navigate = useNavigate();
   const { token } = useAuth();
   const [loading, setLoading] = useState(false);
+  const paymentDoneRef = useRef(false);
+
 
   const {
     amount = 0,
@@ -44,6 +46,8 @@ function PaymentPage() {
   }
 
   const verifyPayment = async (paymentDetails) => {
+    if (paymentDoneRef.current) return; //  BLOCK DOUBLE CALL
+  paymentDoneRef.current = true;       //  LOCK IMMEDIATELY
     try {
       const response = await api("/api/payment/verify", {
         method: "POST",
@@ -62,6 +66,7 @@ function PaymentPage() {
       }
     } catch (error) {
       console.error("Payment Verification Error:", error);
+      paymentDoneRef.current = false; // allow retry only on failure
     }
   };
 
