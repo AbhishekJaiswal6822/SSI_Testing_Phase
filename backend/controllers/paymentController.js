@@ -6,57 +6,75 @@ const { sendInvoiceEmail } = require('../services/emailService');
 
 // Initialize the Razorpay instance
 const razorpayInstance = new Razorpay({
-    key_id: process.env.RAZORPAY_KEY_ID,
-    // ✅ FIX: Changed to match your .env variable name
-    key_secret: process.env.RAZORPAY_KEY_SECRET,
+  key_id: process.env.RAZORPAY_KEY_ID,
+  //  FIX: Changed to match your .env variable name
+  key_secret: process.env.RAZORPAY_KEY_SECRET,
 });
 
 // Optional: Temporary log to verify keys are loading in the terminal
 console.log("Razorpay Keys Initialized:", {
-    key_id: !!process.env.RAZORPAY_KEY_ID,
-    key_secret: !!process.env.RAZORPAY_KEY_SECRET
+  key_id: !!process.env.RAZORPAY_KEY_ID,
+  key_secret: !!process.env.RAZORPAY_KEY_SECRET
 });
 
 // --------------------------------------------------
-// 1️⃣ Create Razorpay Order
+// 1️ Create Razorpay Order
 // --------------------------------------------------
 exports.createOrder = async (req, res) => {
-    const { registrationId, amount } = req.body;
+  const { registrationId, amount } = req.body;
 
-    if (!registrationId || !amount) {
-        return res.status(400).json({
-            success: false,
-            message: 'Missing registration ID or amount.',
-        });
+  if (!registrationId || !amount) {
+    return res.status(400).json({
+      success: false,
+      message: 'Missing registration ID or amount.',
+    });
+  }
+
+  try {
+
+    //  STEP 1: FETCH REGISTRATION
+    const registration = await Registration.findById(registrationId);
+
+    if (!registration) {
+      return res.status(404).json({
+        success: false,
+        message: 'Registration not found',
+      });
     }
 
-    try {
-        const options = {
-            amount: Math.round(amount * 100), // amount in paise
-            currency: 'INR',
-            receipt: `receipt_${registrationId}`,
-            notes: {
-                registrationId,
-            },
-            // Note: 'config' is intentionally omitted here to prevent backend 500 errors.
-            // UI customization (hiding EMI/Wallets) is handled in the frontend.
-        };
-
-        const order = await razorpayInstance.orders.create(options);
-
-        return res.status(200).json({
-            key: process.env.RAZORPAY_KEY_ID,
-            order,
-        });
-
-    } catch (error) {
-        // This will now show the correct error if keys mismatch
-        console.error('Razorpay Order Creation Error:', error);
-        return res.status(500).json({
-            success: false,
-            message: 'Failed to create payment order.',
-        });
+    //  STEP 2: BLOCK DOUBLE PAYMENT
+    if (registration.paymentStatus === 'paid') {
+      return res.status(409).json({
+        success: false,
+        message: 'Payment already completed',
+      });
     }
+    const options = {
+      amount: Math.round(amount * 100), // amount in paise
+      currency: 'INR',
+      receipt: `receipt_${registrationId}`,
+      notes: {
+        registrationId,
+      },
+      // Note: 'config' is intentionally omitted here to prevent backend 500 errors.
+      // UI customization (hiding EMI/Wallets) is handled in the frontend.
+    };
+
+    const order = await razorpayInstance.orders.create(options);
+
+    return res.status(200).json({
+      key: process.env.RAZORPAY_KEY_ID,
+      order,
+    });
+
+  } catch (error) {
+    // This will now show the correct error if keys mismatch
+    console.error('Razorpay Order Creation Error:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to create payment order.',
+    });
+  }
 };
 
 
@@ -70,7 +88,7 @@ exports.verifyPayment = async (req, res) => {
   } = req.body;
 
   try {
-    // 1️⃣ Fetch registration
+    // 1️ Fetch registration
     const registration = await Registration.findById(registrationId);
     if (!registration) {
       return res.status(404).json({
@@ -79,7 +97,15 @@ exports.verifyPayment = async (req, res) => {
       });
     }
 
-    // 2️⃣ SAVE PAYMENT DETAILS (CRITICAL)
+    //  BLOCK DOUBLE PAYMENT
+    if (registration.paymentStatus === 'paid') {
+      return res.status(409).json({
+        success: false,
+        message: 'Payment already completed'
+      });
+    }
+
+    // 2️ SAVE PAYMENT DETAILS (CRITICAL)
     registration.paymentDetails = {
       orderId: razorpay_order_id,
       paymentId: razorpay_payment_id,
@@ -88,13 +114,14 @@ exports.verifyPayment = async (req, res) => {
       paidAt: new Date()
     };
 
-    // 3️⃣ UPDATE REGISTRATION STATUS
+    // 3️ UPDATE REGISTRATION STATUS
+    registration.paymentStatus = 'paid';
     registration.registrationStatus = 'Verified';
 
-    // 4️⃣ SAVE TO DATABASE
+    // 4️ SAVE TO DATABASE
     await registration.save();
 
-    // 5️⃣ PREPARE INVOICE DATA (FROM DB, NOT FRONTEND)
+    // 5️ PREPARE INVOICE DATA (FROM DB, NOT FRONTEND)
     const regObj = registration.toJSON();
     const runner = regObj.runnerDetails;
 
@@ -113,12 +140,12 @@ exports.verifyPayment = async (req, res) => {
       platformFee: runner.platformFee,
       pgFee: runner.pgFee,
       gstAmount: runner.gstAmount,
-      amount: runner.amount // ✅ FINAL FIX FOR ₹0 INVOICE
+      amount: runner.amount //  FINAL FIX FOR ₹0 INVOICE
     };
 
-    console.log('✅ INVOICE AMOUNT SENT:', invoiceData.amount);
+    console.log(' INVOICE AMOUNT SENT:', invoiceData.amount);
 
-    // 6️⃣ SEND INVOICE EMAIL
+    // 6️ SEND INVOICE EMAIL
     await sendInvoiceEmail(invoiceData.email, invoiceData);
 
     return res.status(200).json({
@@ -128,7 +155,7 @@ exports.verifyPayment = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Verify payment error:', error);
+    console.error(' Verify payment error:', error);
     return res.status(500).json({
       success: false,
       message: 'Verification failed'
