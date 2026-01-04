@@ -462,69 +462,69 @@ function Register() {
     const raceIsSelected = selectedRace || (registrationType === 'group' && groupMembers.length > 0 && groupMembers[0]?.raceId);
 
     // if (raceIsSelected) {
-        // This calculates the price ONLY if a race is selected for individual/charity OR for the first group member
+    // This calculates the price ONLY if a race is selected for individual/charity OR for the first group member
 
-        // --- Determine Base Registration Fee (rawRegistrationFee) ---
-        // if (registrationType === "individual" || registrationType === "charity") {
-        //     if (selectedRace) {
-        //         rawRegistrationFee = (registrationType === "individual")
-        //             ? selectedRace.prebookPrice
-        //             : selectedRace.charityFee;
-        //         discountAmount = 0;
-        //     }
-        // } else if (registrationType === "group") {
-        //     const memberPrices = groupMembers.map(member => {
-        //         const race = raceCategories.find(r => r.id === member.raceId);
-        //         // CRASH FIX: Ensure race is found before accessing price, default to 0
-        //         return race ? race.prebookPrice : 0;
-        //     });
+    // --- Determine Base Registration Fee (rawRegistrationFee) ---
+    // if (registrationType === "individual" || registrationType === "charity") {
+    //     if (selectedRace) {
+    //         rawRegistrationFee = (registrationType === "individual")
+    //             ? selectedRace.prebookPrice
+    //             : selectedRace.charityFee;
+    //         discountAmount = 0;
+    //     }
+    // } else if (registrationType === "group") {
+    //     const memberPrices = groupMembers.map(member => {
+    //         const race = raceCategories.find(r => r.id === member.raceId);
+    //         // CRASH FIX: Ensure race is found before accessing price, default to 0
+    //         return race ? race.prebookPrice : 0;
+    //     });
 
-        //     rawRegistrationFee = memberPrices.reduce((sum, price) => sum + price, 0);
+    //     rawRegistrationFee = memberPrices.reduce((sum, price) => sum + price, 0);
 
-            // Group Discount calculation remains the same, based on rawRegistrationFee
-            // if (memberCount >= 25) discountPercent = 20;
-            // else if (memberCount >= 10) discountPercent = 15;
-            // else if (memberCount >= 5) discountPercent = 10;
+    // Group Discount calculation remains the same, based on rawRegistrationFee
+    // if (memberCount >= 25) discountPercent = 20;
+    // else if (memberCount >= 10) discountPercent = 15;
+    // else if (memberCount >= 5) discountPercent = 10;
 
-        //     if (memberCount >= 25) discountPercent = 12;
-        //     else if (memberCount >= 10) discountPercent = 8;
-        //     else if (memberCount >= 5) discountPercent = 0;
+    //     if (memberCount >= 25) discountPercent = 12;
+    //     else if (memberCount >= 10) discountPercent = 8;
+    //     else if (memberCount >= 5) discountPercent = 0;
 
-        //     if (discountPercent > 0) {
-        //         discountAmount = Math.round(rawRegistrationFee * (discountPercent / 100));
-        //     }
-        // }
+    //     if (discountPercent > 0) {
+    //         discountAmount = Math.round(rawRegistrationFee * (discountPercent / 100));
+    //     }
+    // }
 
-        // STEP 1: Calculate PG FEE BASE (Registration Fee - Discount)
-        // pgBaseForRegFee = rawRegistrationFee - discountAmount;
+    // STEP 1: Calculate PG FEE BASE (Registration Fee - Discount)
+    // pgBaseForRegFee = rawRegistrationFee - discountAmount;
 
-        // STEP 2: Calculate Platform Fee
-        // const currentRaceId = selectedRace?.id || (groupMembers.length > 0 ? groupMembers[0].raceId : null);
-        // if (registrationType === 'group') {
-            // Sums individual platform fees for every group member based on their specific race
-        //     platformFee = groupMembers.reduce((sum, member) => {
-        //         return sum + getPlatformFee(member.raceId);
-        //     }, 0);
-        // } else {
-            // Individual and Charity logic remains untouched
-            // const currentRaceId = selectedRace?.id;
-            // if (currentRaceId) {
-            //     platformFee = getPlatformFee(currentRaceId);
-            // }
-        // }
+    // STEP 2: Calculate Platform Fee
+    // const currentRaceId = selectedRace?.id || (groupMembers.length > 0 ? groupMembers[0].raceId : null);
+    // if (registrationType === 'group') {
+    // Sums individual platform fees for every group member based on their specific race
+    //     platformFee = groupMembers.reduce((sum, member) => {
+    //         return sum + getPlatformFee(member.raceId);
+    //     }, 0);
+    // } else {
+    // Individual and Charity logic remains untouched
+    // const currentRaceId = selectedRace?.id;
+    // if (currentRaceId) {
+    //     platformFee = getPlatformFee(currentRaceId);
+    // }
+    // }
 
-        // STEP 3: Calculate Subtotal before PG/GST (RegFeeNet + PF)
-        // const subtotalBeforePG = pgBaseForRegFee + platformFee;
+    // STEP 3: Calculate Subtotal before PG/GST (RegFeeNet + PF)
+    // const subtotalBeforePG = pgBaseForRegFee + platformFee;
 
-        // STEP 4: Calculate PG Fee and GST (Based on pgBaseForRegFee, 2.1%)
-        // const pgFeeRaw = pgBaseForRegFee * PG_FEE_RATE;
-        // pgFee = roundToTwoDecimal(pgFeeRaw);
+    // STEP 4: Calculate PG Fee and GST (Based on pgBaseForRegFee, 2.1%)
+    // const pgFeeRaw = pgBaseForRegFee * PG_FEE_RATE;
+    // pgFee = roundToTwoDecimal(pgFeeRaw);
 
-        // const gstAmountRaw = pgFee * GST_RATE;
-        // gstAmount = roundToTwoDecimal(gstAmountRaw);
+    // const gstAmountRaw = pgFee * GST_RATE;
+    // gstAmount = roundToTwoDecimal(gstAmountRaw);
 
-        // STEP 5: Calculate Final Total Payable (Total Payable = Subtotal + PG Fee + GST)
-        // totalAmountPayable = roundToTwoDecimal(subtotalBeforePG + pgFee + gstAmount);
+    // STEP 5: Calculate Final Total Payable (Total Payable = Subtotal + PG Fee + GST)
+    // totalAmountPayable = roundToTwoDecimal(subtotalBeforePG + pgFee + gstAmount);
     // } else {
     //      If no race is selected, explicitly zero out fields shown in summary
     //     rawRegistrationFee = 0;
@@ -536,105 +536,105 @@ function Register() {
     // }
 
     if (raceIsSelected) {
-    // Reset values to avoid stale data
-    rawRegistrationFee = 0;
-    discountAmount = 0;
-    discountPercent = 0;
-    platformFee = 0;
+        // Reset values to avoid stale data
+        rawRegistrationFee = 0;
+        discountAmount = 0;
+        discountPercent = 0;
+        platformFee = 0;
 
-    // --------------------------------------------------
-    // 1. BASE REGISTRATION FEE
-    // --------------------------------------------------
+        // --------------------------------------------------
+        // 1. BASE REGISTRATION FEE
+        // --------------------------------------------------
 
-    // INDIVIDUAL / CHARITY
-    if (registrationType === "individual" || registrationType === "charity") {
-        if (selectedRace) {
-            rawRegistrationFee =
-                registrationType === "individual"
-                    ? selectedRace.prebookPrice
-                    : selectedRace.charityFee;
+        // INDIVIDUAL / CHARITY
+        if (registrationType === "individual" || registrationType === "charity") {
+            if (selectedRace) {
+                rawRegistrationFee =
+                    registrationType === "individual"
+                        ? selectedRace.prebookPrice
+                        : selectedRace.charityFee;
 
-            // Coupon ONLY for individual
-            if (
-                registrationType === "individual" &&
-                individualRunner.referralCode === COUPON_CODE
-            ) {
-                discountPercent = COUPON_DISCOUNT_PERCENT;
+                // Coupon ONLY for individual
+                if (
+                    registrationType === "individual" &&
+                    individualRunner.referralCode === COUPON_CODE
+                ) {
+                    discountPercent = COUPON_DISCOUNT_PERCENT;
+                    discountAmount = Math.round(
+                        rawRegistrationFee * (discountPercent / 100)
+                    );
+                }
+            }
+        }
+
+        // GROUP
+        else if (registrationType === "group") {
+            const memberPrices = groupMembers.map(member => {
+                const race = raceCategories.find(r => r.id === member.raceId);
+                return race ? race.prebookPrice : 0;
+            });
+
+            rawRegistrationFee = memberPrices.reduce(
+                (sum, price) => sum + price,
+                0
+            );
+
+            // Group discount (NO coupon here)
+            if (memberCount >= 25) discountPercent = 12;
+            else if (memberCount >= 10) discountPercent = 8;
+            else discountPercent = 0;
+
+            if (discountPercent > 0) {
                 discountAmount = Math.round(
                     rawRegistrationFee * (discountPercent / 100)
                 );
             }
         }
-    }
 
-    // GROUP
-    else if (registrationType === "group") {
-        const memberPrices = groupMembers.map(member => {
-            const race = raceCategories.find(r => r.id === member.raceId);
-            return race ? race.prebookPrice : 0;
-        });
+        // --------------------------------------------------
+        // 2. PG BASE (Registration Fee - Discount)
+        // --------------------------------------------------
+        pgBaseForRegFee = rawRegistrationFee - discountAmount;
 
-        rawRegistrationFee = memberPrices.reduce(
-            (sum, price) => sum + price,
-            0
-        );
-
-        // Group discount (NO coupon here)
-        if (memberCount >= 25) discountPercent = 12;
-        else if (memberCount >= 10) discountPercent = 8;
-        else discountPercent = 0;
-
-        if (discountPercent > 0) {
-            discountAmount = Math.round(
-                rawRegistrationFee * (discountPercent / 100)
+        // --------------------------------------------------
+        // 3. PLATFORM FEE
+        // --------------------------------------------------
+        if (registrationType === "group") {
+            platformFee = groupMembers.reduce(
+                (sum, member) => sum + getPlatformFee(member.raceId),
+                0
             );
+        } else if (selectedRace) {
+            platformFee = getPlatformFee(selectedRace.id);
         }
-    }
 
-    // --------------------------------------------------
-    // 2. PG BASE (Registration Fee - Discount)
-    // --------------------------------------------------
-    pgBaseForRegFee = rawRegistrationFee - discountAmount;
+        // --------------------------------------------------
+        // 4. PG FEE & GST
+        // --------------------------------------------------
+        const pgFeeRaw = pgBaseForRegFee * PG_FEE_RATE;
+        pgFee = roundToTwoDecimal(pgFeeRaw);
 
-    // --------------------------------------------------
-    // 3. PLATFORM FEE
-    // --------------------------------------------------
-    if (registrationType === "group") {
-        platformFee = groupMembers.reduce(
-            (sum, member) => sum + getPlatformFee(member.raceId),
-            0
+        const gstAmountRaw = pgFee * GST_RATE;
+        gstAmount = roundToTwoDecimal(gstAmountRaw);
+
+        // --------------------------------------------------
+        // 5. FINAL TOTAL
+        // --------------------------------------------------
+        const subtotalBeforePG = pgBaseForRegFee + platformFee;
+        totalAmountPayable = roundToTwoDecimal(
+            subtotalBeforePG + pgFee + gstAmount
         );
-    } else if (selectedRace) {
-        platformFee = getPlatformFee(selectedRace.id);
+
+    } else {
+        // No race selected → everything zero
+        rawRegistrationFee = 0;
+        discountAmount = 0;
+        discountPercent = 0;
+        platformFee = 0;
+        pgFee = 0;
+        gstAmount = 0;
+        totalAmountPayable = 0;
     }
-
-    // --------------------------------------------------
-    // 4. PG FEE & GST
-    // --------------------------------------------------
-    const pgFeeRaw = pgBaseForRegFee * PG_FEE_RATE;
-    pgFee = roundToTwoDecimal(pgFeeRaw);
-
-    const gstAmountRaw = pgFee * GST_RATE;
-    gstAmount = roundToTwoDecimal(gstAmountRaw);
-
-    // --------------------------------------------------
-    // 5. FINAL TOTAL
-    // --------------------------------------------------
-    const subtotalBeforePG = pgBaseForRegFee + platformFee;
-    totalAmountPayable = roundToTwoDecimal(
-        subtotalBeforePG + pgFee + gstAmount
-    );
-
-} else {
-    // No race selected → everything zero
-    rawRegistrationFee = 0;
-    discountAmount = 0;
-    discountPercent = 0;
-    platformFee = 0;
-    pgFee = 0;
-    gstAmount = 0;
-    totalAmountPayable = 0;
-}
 
     // --- Price calculation logic end ---
 
@@ -1656,13 +1656,26 @@ function Register() {
                                     )}
 
                                     {/* 2. Discount (UPDATED with Percentage) */}
-                                    {discountAmount > 0 && (
+                                    {/* {discountAmount > 0 && (
                                         <div className="flex justify-between text-green-600">
-                                            {/* Display discount percentage */}
+                                            Display discount percentage
                                             <span className="font-semibold pl-4">Discount {discountPercent > 0 ? `(${discountPercent}%)` : ''}:</span>
                                             <span className="font-semibold">–₹{discountAmount.toFixed(2)}</span>
                                         </div>
+                                    )} */}
+
+                                    {discountAmount > 0 && (
+                                        <div className="flex justify-between text-green-600">
+                                            <span className="font-semibold pl-4">
+                                                {registrationType === "individual"
+                                                    ? `Coupon Code Discount (${discountPercent}%)`
+                                                    : `Discount (${discountPercent}%)`}
+                                                :
+                                            </span>
+                                            <span className="font-semibold">–₹{discountAmount.toFixed(2)}</span>
+                                        </div>
                                     )}
+
 
                                     {/* 3. Platform Fee (Non-taxable) */}
                                     {platformFee > 0 && (
