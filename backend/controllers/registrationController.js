@@ -19,6 +19,14 @@ const storage = multer.diskStorage({
     }
 });
 
+// --- COUPON CONFIG ---
+const COUPONS = {
+    LOKRAJA10: {
+        percent: 10,
+        registrationType: "individual"
+    }
+};
+
 // --- 2. Middleware Configuration ---
 exports.uploadIDProof = multer({
     storage: storage,
@@ -60,6 +68,33 @@ exports.submitRegistration = async (req, res) => {
             });
         }
 
+        // ----------------------------------
+        // COUPON VALIDATION (BACKEND)
+        // ----------------------------------
+        let discountAmount = 0;
+        let discountPercent = 0;
+
+        // Normalize coupon code
+        const couponCode = (data.referralCode || "").toUpperCase();
+
+        // Apply coupon ONLY if valid
+        if (
+            couponCode &&
+            COUPONS[couponCode] &&
+            data.registrationType === COUPONS[couponCode].registrationType
+        ) {
+            discountPercent = COUPONS[couponCode].percent;
+
+            const baseFee = Number(data.registrationFee) || 0;
+
+            if (baseFee > 0) {
+                discountAmount = Math.round(
+                    baseFee * (discountPercent / 100)
+                );
+            }
+        }
+
+
         const registration = new Registration({
             user: req.user.id,
             registrationType: data.registrationType,
@@ -68,11 +103,15 @@ exports.submitRegistration = async (req, res) => {
             runnerDetails: {
                 ...data,
                 registrationFee: Number(data.registrationFee) || finalAmount,
-                discountAmount: Number(data.discountAmount) || 0,
+                // discountAmount: Number(data.discountAmount) || 0,
+                //  Coupon-related fields (NEW)
+                couponCode: couponCode || null,
+                discountPercent: discountPercent,
+                discountAmount: discountAmount,
                 platformFee: Number(data.platformFee) || 0,
                 pgFee: Number(data.pgFee) || 0,
                 gstAmount: Number(data.gstAmount) || 0,
-                amount: finalAmount 
+                amount: finalAmount
             },
 
             idProof: {
