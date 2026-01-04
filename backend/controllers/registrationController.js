@@ -75,7 +75,12 @@ exports.submitRegistration = async (req, res) => {
         let discountPercent = 0;
 
         // Normalize coupon code
-        const couponCode = (data.referralCode || "").toUpperCase();
+        // const couponCode = (data.referralCode || "").toUpperCase();
+        const couponCode =
+            typeof data.referralCode === "string"
+                ? data.referralCode.trim().toUpperCase()
+                : "";
+
 
         // Apply coupon ONLY if valid
         if (
