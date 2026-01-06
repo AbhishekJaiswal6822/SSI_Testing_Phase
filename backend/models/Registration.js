@@ -70,11 +70,6 @@ const RegistrationSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-
-    // runnerDetails: {
-    //     type: RunnerDetailsSchema,
-    //     required: true,
-    // },
     runnerDetails: {
         type: RunnerDetailsSchema,
         required: function () {
