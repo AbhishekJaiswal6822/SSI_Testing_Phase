@@ -1,3 +1,4 @@
+// C:\Users\abhis\OneDrive\Desktop\SOFTWARE_DEVELOPER_LEARNING\marathon_project\backend\controllers\registrationController.js
 const Registration = require('../models/Registration');
 const multer = require('multer');
 const AWS = require('aws-sdk');
@@ -46,10 +47,7 @@ exports.submitRegistration = async (req, res) => {
         /* ----------------------------------
            FILE REQUIRED FOR NON-GROUP
         ---------------------------------- */
-        if (
-            (data.registrationType !== 'group' && !req.file) ||
-            (data.registrationType === 'group' && !req.file)
-        ) {
+        if (!req.file) {
             return res.status(400).json({
                 success: false,
                 message: 'ID proof document is required'
@@ -257,5 +255,25 @@ exports.submitRegistration = async (req, res) => {
             message: 'Server error',
             error: error.message
         });
+    }
+};
+
+exports.getUserRegistration = async (req, res) => {
+    try {
+        // Fetch the latest registration for the authenticated user
+        const registration = await Registration.findOne({ user: req.user.id })
+            .sort({ registeredAt: -1 });
+
+        if (!registration) {
+            return res.status(404).json({
+                success: false,
+                message: "No registration record found."
+            });
+        }
+
+        res.status(200).json({ success: true, data: registration });
+    } catch (error) {
+        console.error('Dashboard Error:', error);
+        res.status(500).json({ success: false, message: 'Server error fetching dashboard' });
     }
 };
