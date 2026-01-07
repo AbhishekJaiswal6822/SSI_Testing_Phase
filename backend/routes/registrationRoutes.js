@@ -1,11 +1,16 @@
-
-
 // C:\Users\abhis\OneDrive\Desktop\SOFTWARE_DEVELOPER_LEARNING\marathon_project\backend\routes\registrationRoutes.js - FINAL FIX
 
 const express = require('express');
 const router = express.Router();
 const registrationController = require('../controllers/registrationController');
 const authMiddleware = require('../middleware/authMiddleware'); 
+
+// GET current user's registration for the dashboard
+router.get(
+  '/my-registration', 
+  authMiddleware, 
+  registrationController.getUserRegistration
+);
 
 // Route to handle registration submission (POST request)
 // The URL will now be: /api/register + / = /api/register
