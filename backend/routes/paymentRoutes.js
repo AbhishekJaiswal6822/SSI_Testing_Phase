@@ -5,6 +5,9 @@ const router = express.Router();
 const authMiddleware = require('../middleware/authMiddleware');
 const paymentController = require('../controllers/paymentController'); 
 
+// GET /api/payments/invoice/:registrationId
+router.get('/invoice/:registrationId', authMiddleware, paymentController.downloadInvoice);
+
 // Creating the Order
 router.post("/order", authMiddleware, paymentController.createOrder);
 
