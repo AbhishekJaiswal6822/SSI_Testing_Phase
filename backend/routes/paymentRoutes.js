@@ -6,7 +6,7 @@ const authMiddleware = require('../middleware/authMiddleware');
 const paymentController = require('../controllers/paymentController'); 
 
 // GET /api/payments/invoice/:registrationId
-router.get('/invoice/:registrationId', authMiddleware, paymentController.downloadInvoice);
+router.get('/invoice/:registrationId', paymentController.downloadInvoice);
 
 // Creating the Order
 router.post("/order", authMiddleware, paymentController.createOrder);
