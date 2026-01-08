@@ -26,7 +26,7 @@ const UserDashboard = () => {
     }, [token]);
 
     const handleDownload = () => {
-        window.open(`${import.meta.env.VITE_API_BASE_URL}/api/payments/invoice/${reg._id}`, "_blank");
+        window.open(`${import.meta.env.VITE_API_BASE_URL}/api/payment/invoice/${reg._id}`, "_blank");
     };
 
     if (loading) return <div className="min-h-screen flex items-center justify-center">Loading Profile...</div>;
