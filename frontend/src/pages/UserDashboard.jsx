@@ -1,3 +1,8 @@
+import React, { useEffect, useState } from "react";
+import { useAuth } from "../AuthProvider";
+import { api } from "../api";
+import { toast } from "react-toastify";
+
 const UserDashboard = () => {
     const { token, user } = useAuth();
     const [registrations, setRegistrations] = useState([]); // Changed: State is now an array
