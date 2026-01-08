@@ -168,6 +168,7 @@ exports.submitRegistration = async (req, res) => {
         // ----------------------------------
         // PREVENT DUPLICATE PENDING REGISTRATION
         // ----------------------------------
+        /*
         const existingRegistration = await Registration.findOne({
             user: req.user.id,
             paymentStatus: 'pending'
@@ -181,7 +182,7 @@ exports.submitRegistration = async (req, res) => {
                 registrationId: existingRegistration._id
             });
         }
-
+*/
         /* ----------------------------------
            CREATE REGISTRATION DOCUMENT
         ---------------------------------- */
@@ -260,18 +261,19 @@ exports.submitRegistration = async (req, res) => {
 
 exports.getUserRegistration = async (req, res) => {
     try {
-        // Fetch the latest registration for the authenticated user
-        const registration = await Registration.findOne({ user: req.user.id })
+        // CHANGE: Use .find() instead of .findOne() to get ALL records
+        const registrations = await Registration.find({ user: req.user.id })
             .sort({ registeredAt: -1 });
 
-        if (!registration) {
-            return res.status(404).json({
-                success: false,
-                message: "No registration record found."
+        // If registrations is an empty array, it means no records found
+        if (!registrations || registrations.length === 0) {
+            return res.status(200).json({
+                success: true,
+                data: [] // Return empty array instead of 404 for better frontend handling
             });
         }
 
-        res.status(200).json({ success: true, data: registration });
+        res.status(200).json({ success: true, data: registrations });
     } catch (error) {
         console.error('Dashboard Error:', error);
         res.status(500).json({ success: false, message: 'Server error fetching dashboard' });
