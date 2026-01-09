@@ -190,7 +190,14 @@ exports.submitRegistration = async (req, res) => {
             user: req.user.id,
             registrationType: mergedData.registrationType,
             raceCategory: mergedData.raceId || mergedData.raceCategory,
-
+            amount: finalAmount,
+            registrationFee: Number(mergedData.registrationFee) || finalAmount,
+            discountPercent: discountPercent || 0,
+            discountAmount: discountAmount || 0,
+            platformFee: Number(mergedData.platformFee) || 0,
+            pgFee: Number(mergedData.pgFee) || 0,
+            gstAmount: Number(mergedData.gstAmount) || 0,
+            couponCode,
             runnerDetails:
                 mergedData.registrationType !== 'group'
                     ? {
@@ -213,15 +220,7 @@ exports.submitRegistration = async (req, res) => {
                         experience: mergedData.experience,
                         finishTime: mergedData.finishTime,
                         dietary: mergedData.dietary,
-                        tshirtSize: mergedData.tshirtSize,
-                        registrationFee: Number(mergedData.registrationFee) || finalAmount,
-                        couponCode,
-                        discountPercent,
-                        discountAmount,
-                        platformFee: Number(mergedData.platformFee) || 0,
-                        pgFee: Number(mergedData.pgFee) || 0,
-                        gstAmount: Number(mergedData.gstAmount) || 0,
-                        amount: finalAmount
+                        tshirtSize: mergedData.tshirtSize
                     }
                     : undefined,
 

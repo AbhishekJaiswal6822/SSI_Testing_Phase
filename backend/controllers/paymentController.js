@@ -134,12 +134,13 @@ exports.verifyPayment = async (req, res) => {
       raceCategory: registration.raceCategory,
       paymentMode: 'Razorpay',
       invoiceNo: `LRCP-${Date.now()}`,
-      rawRegistrationFee: isGroup ? (registration.amount || 0) : (registration.runnerDetails.registrationFee || 0),
-      discountAmount: isGroup ? 0 : (registration.runnerDetails.discountAmount || 0),
-      platformFee: isGroup ? 0 : (registration.runnerDetails.platformFee || 0),
-      pgFee: isGroup ? 0 : (registration.runnerDetails.pgFee || 0),
-      gstAmount: isGroup ? 0 : (registration.runnerDetails.gstAmount || 0),
-      amount: registration.runnerDetails?.amount || registration.amount
+      // ✅ FIX: Use the root fields that you are now saving in registrationController
+      rawRegistrationFee: registration.registrationFee || registration.runnerDetails?.registrationFee || 0,
+      discountAmount: registration.discountAmount || registration.runnerDetails?.discountAmount || 0,
+      platformFee: registration.platformFee || registration.runnerDetails?.platformFee || 0,
+      pgFee: registration.pgFee || registration.runnerDetails?.pgFee || 0,
+      gstAmount: registration.gstAmount || registration.runnerDetails?.gstAmount || 0,
+      amount: Number(registration.amount || registration.runnerDetails?.amount || 0)
     };
 
     // 6️ SEND INVOICE EMAIL
@@ -181,12 +182,12 @@ exports.downloadInvoice = async (req, res) => {
       email: primary?.email,
       raceCategory: registration.raceCategory,
       registrationType: registration.registrationType,
-      amount: registration.runnerDetails?.amount || registration.amount,
-      rawRegistrationFee: registration.runnerDetails?.registrationFee || registration.amount,
-      discountAmount: registration.runnerDetails?.discountAmount || 0,
-      platformFee: registration.runnerDetails?.platformFee || 0,
-      pgFee: registration.runnerDetails?.pgFee || 0,
-      gstAmount: registration.runnerDetails?.gstAmount || 0,
+      amount: registration.amount || registration.runnerDetails?.amount || 0,
+      rawRegistrationFee: registration.registrationFee || registration.runnerDetails?.registrationFee || 0,
+      discountAmount: registration.discountAmount || registration.runnerDetails?.discountAmount || 0,
+      platformFee: registration.platformFee || registration.runnerDetails?.platformFee || 0,
+      pgFee: registration.pgFee || registration.runnerDetails?.pgFee || 0,
+      gstAmount: registration.gstAmount || registration.runnerDetails?.gstAmount || 0,
       paymentMode: 'Razorpay'
     };
 

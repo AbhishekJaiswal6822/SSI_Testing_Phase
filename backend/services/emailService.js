@@ -1,3 +1,4 @@
+// C:\Users\abhis\OneDrive\Desktop\SOFTWARE_DEVELOPER_LEARNING\marathon_project\backend\services\emailService.js
 const path = require('path');
 const PDFDocument = require('pdfkit');
 const nodemailer = require('nodemailer');
@@ -71,7 +72,8 @@ const generateInvoicePDF = (doc, paymentData) => {
     // --- TOTAL ---
     doc.rect(40, currentY, 515, 22).fill('#f0f9f9');
     doc.fillColor('#008080').font('Helvetica-Bold').fontSize(10).text('TOTAL PAID', 50, currentY + 6);
-    doc.text(`Rs. ${Number(paymentData.amount).toFixed(2)}`, 450, currentY + 6, { width: 90, align: 'right' });
+    const displayAmount = parseFloat(paymentData.amount) || 0;
+    doc.text(`Rs. ${displayAmount.toFixed(2)}`, 450, currentY + 6, { width: 90, align: 'right' });
 
     // --- FOOTER ---
     doc.moveDown(2).fillColor('#444444').fontSize(7.5).font('Helvetica-Oblique');

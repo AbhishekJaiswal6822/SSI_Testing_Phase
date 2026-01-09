@@ -23,16 +23,7 @@ const RunnerDetailsSchema = new mongoose.Schema({
     experience: { type: String },
     finishTime: { type: String },
     dietary: { type: String },
-    tshirtSize: { type: String, required: true },
-    registrationFee: { type: Number, default: 0 },
-    couponCode: { type: String, default: null },
-    discountPercent: { type: Number, default: 0 },
-    discountAmount: { type: Number, default: 0 },
-    platformFee: { type: Number, default: 0 },
-    pgFee: { type: Number, default: 0 },
-    gstAmount: { type: Number, default: 0 },
-    amount: { type: Number, required: true }, //  Amount payable (before payment)
-
+    tshirtSize: { type: String, required: true }
 },
     { strict: true });
 
@@ -70,6 +61,14 @@ const RegistrationSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    amount: { type: Number, required: true }, //  Amount payable (before payment)
+    registrationFee: { type: Number, default: 0 },
+    couponCode: { type: String, default: null },
+    discountPercent: { type: Number, default: 0 },
+    discountAmount: { type: Number, default: 0 },
+    platformFee: { type: Number, default: 0 },
+    pgFee: { type: Number, default: 0 },
+    gstAmount: { type: Number, default: 0 },
     runnerDetails: {
         type: RunnerDetailsSchema,
         required: function () {
