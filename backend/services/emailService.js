@@ -27,7 +27,10 @@ const generateInvoicePDF = (doc, paymentData) => {
     doc.moveTo(40, doc.y + 10).lineTo(555, doc.y + 10).strokeColor('#008080').lineWidth(1).stroke();
     doc.moveDown(2);
 
-    const registrationTypeLabel = paymentData.registrationType === 'individual' ? 'Individual' : paymentData.registrationType === 'group' ? 'Group' : 'Charity';
+    const registrationTypeLabel = 
+    paymentData.registrationType === 'individual' ? 'Individual Registration' : 
+    paymentData.registrationType === 'group' ? 'Group Registration' : 
+    'Charity Registration';
 
     // --- INFO GRID ---
     const gridY = doc.y;

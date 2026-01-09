@@ -17,6 +17,15 @@ const razorpayInstance = new Razorpay({
 //   key_secret: !!process.env.RAZORPAY_KEY_SECRET
 // });
 
+// Race Labels
+const raceLabels = {
+  '5k': '5K Fun Run',
+  '10k': '10K Challenge',
+  'half': 'Half Marathon (21.097K)',
+  'full': 'Full Marathon (42K)',
+  '35k': '35K Ultra'
+};
+
 // --------------------------------------------------
 // 1️ Create Razorpay Order
 // --------------------------------------------------
@@ -145,7 +154,7 @@ exports.verifyPayment = async (req, res) => {
       phone: primary.phone,
       email: primary.email,
       registrationType: registration.registrationType,
-      raceCategory: registration.raceCategory,
+      raceCategory: raceLabels[registration.raceCategory] || registration.raceCategory,
       paymentMode: dynamicMethod,
       invoiceNo: `LRCP-${Date.now()}`,
       //  FIX: Use the root fields that you are now saving in registrationController
@@ -209,7 +218,7 @@ exports.downloadInvoice = async (req, res) => {
       fullName: `${primary?.firstName} ${primary?.lastName}`,
       phone: primary?.phone,
       email: primary?.email,
-      raceCategory: registration.raceCategory,
+      raceCategory: raceLabels[registration.raceCategory] || registration.raceCategory,
       registrationType: registration.registrationType,
       amount: registration.amount || registration.runnerDetails?.amount || 0,
       rawRegistrationFee: registration.registrationFee || registration.runnerDetails?.registrationFee || 0,
