@@ -1,13 +1,21 @@
+//C:\Users\abhis\OneDrive\Desktop\SOFTWARE_DEVELOPER_LEARNING\marathon_project\frontend\src\pages\UserDashboard.jsx
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../AuthProvider";
 import { api } from "../api";
 import { toast } from "react-toastify";
 
 const typeLabels = {
-        individual: "Individual Registration",
-        group: "Group Registration",
-        charity: "Charity Registration"
-    };
+    individual: "Individual Registration",
+    group: "Group Registration",
+    charity: "Charity Registration"
+};
+const categoryLabels = {
+    "5k": "5K Fun Run",
+    "10k": "10K Challenge",
+    "half": "Half Marathon (21.097K)",
+    "35k": "35K Ultra",
+    "full": "Full Marathon (42K)"
+};
 
 const UserDashboard = () => {
     const { token, user } = useAuth();
@@ -18,8 +26,15 @@ const UserDashboard = () => {
         const fetchDashboardData = async () => {
             try {
                 const response = await api("/api/register/my-registration", { token });
-                // Store the array of data
-                if (response.success) setRegistrations(response.data);
+
+                if (response.success) {
+                    // FIX: Force data to be an array so .map() doesn't crash
+                    const normalizedData = Array.isArray(response.data)
+                        ? response.data
+                        : response.data ? [response.data] : [];
+
+                    setRegistrations(normalizedData);
+                }
             } catch (err) {
                 console.error("Dashboard error:", err);
             } finally {
@@ -56,7 +71,7 @@ const UserDashboard = () => {
                     <div key={reg._id} className="grid md:grid-cols-3 gap-8 bg-white rounded-3xl p-8 shadow-sm border border-slate-100 mb-6">
                         {/* --- REGISTRATION SUMMARY --- */}
                         <div className="md:col-span-2">
-                            <h2 className="text-xl font-bold mb-6">📋 {reg.raceCategory} Details</h2>
+                            <h2 className="text-xl font-bold mb-6">📋 {categoryLabels[reg.raceCategory?.toLowerCase()] || reg.raceCategory} Details Details Details</h2>
                             <div className="grid grid-cols-2 gap-8 text-sm">
                                 <div>
                                     <p className="text-slate-400 font-bold uppercase text-[10px] tracking-widest">Payment Status</p>
