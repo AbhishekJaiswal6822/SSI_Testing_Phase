@@ -165,27 +165,9 @@ exports.submitRegistration = async (req, res) => {
             };
         }
 
-        // ----------------------------------
-        // PREVENT DUPLICATE PENDING REGISTRATION
-        // ----------------------------------
-        /*
-        const existingRegistration = await Registration.findOne({
-            user: req.user.id,
-            paymentStatus: 'pending'
-        });
-
-        if (existingRegistration) {
-            return res.status(409).json({
-                success: false,
-                errorCode: 'REGISTRATION_EXISTS',
-                message: 'You already have a pending registration.',
-                registrationId: existingRegistration._id
-            });
-        }
-*/
         /* ----------------------------------
-           CREATE REGISTRATION DOCUMENT
-        ---------------------------------- */
+               CREATE REGISTRATION DOCUMENT
+            ---------------------------------- */
         const registration = new Registration({
             user: req.user.id,
             registrationType: mergedData.registrationType,
@@ -276,5 +258,29 @@ exports.getUserRegistration = async (req, res) => {
     } catch (error) {
         console.error('Dashboard Error:', error);
         res.status(500).json({ success: false, message: 'Server error fetching dashboard' });
+    }
+};
+
+/* =====================================================
+    ADMIN ONLY: FETCH ALL REGISTRATIONS
+===================================================== */
+exports.getAllRegistrations = async (req, res) => {
+    try {
+        // Fetch all registrations and sort by newest first
+        const allRegistrations = await Registration.find({})
+            .populate('user', 'name email phone') // This joins user data so you see their name
+            .sort({ registeredAt: -1 });
+
+        res.status(200).json({
+            success: true,
+            count: allRegistrations.length,
+            data: allRegistrations
+        });
+    } catch (error) {
+        console.error('Admin Fetch Error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Server error while fetching all registrations'
+        });
     }
 };
