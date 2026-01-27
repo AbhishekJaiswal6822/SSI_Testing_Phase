@@ -1,483 +1,193 @@
-// src/AdminDashboard.jsx
-import React, { useState } from "react";
+// C:\Users\abhis\OneDrive\Desktop\SOFTWARE_DEVELOPER_LEARNING\marathon_project\frontend\src\AdminDashboard.jsx
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import { FiUsers, FiDownload, FiSearch, FiFilter, FiTag } from "react-icons/fi";
-
-const usersData = [
-  {
-    name: "John Doe",
-    email: "john@example.com",
-    phone: "+1234567890",
-    age: 28,
-    gender: "Male",
-    date: "2024-01-15",
-    status: "Active",
-  },
-  {
-    name: "Jane Smith",
-    email: "jane@example.com",
-    phone: "+1234567891",
-    age: 25,
-    gender: "Female",
-    date: "2024-01-16",
-    status: "Active",
-  },
-  {
-    name: "Mike Johnson",
-    email: "mike@example.com",
-    phone: "+1234567892",
-    age: 32,
-    gender: "Male",
-    date: "2024-01-17",
-    status: "Inactive",
-  },
-  {
-    name: "Sarah Wilson",
-    email: "sarah@example.com",
-    phone: "+1234567893",
-    age: 29,
-    gender: "Female",
-    date: "2024-01-18",
-    status: "Active",
-  },
-];
-
-const registrationsData = [
-  {
-    bib: "A001",
-    name: "John Doe",
-    category: "42K",
-    paymentStatus: "Completed",
-    amount: "₹2500",
-    date: "2024-01-15",
-    accommodation: "Yes",
-  },
-  {
-    bib: "B002",
-    name: "Jane Smith",
-    category: "22K",
-    paymentStatus: "Pending",
-    amount: "₹1800",
-    date: "2024-01-16",
-    accommodation: "No",
-  },
-  {
-    bib: "C003",
-    name: "Mike Johnson",
-    category: "10K",
-    paymentStatus: "Completed",
-    amount: "₹1200",
-    date: "2024-01-17",
-    accommodation: "Yes",
-  },
-  {
-    bib: "D004",
-    name: "Sarah Wilson",
-    category: "5K",
-    paymentStatus: "Failed",
-    amount: "₹800",
-    date: "2024-01-18",
-    accommodation: "No",
-  },
-];
-
-const statsCards = [
-  { label: "Total", value: 7 },
-  { label: "Individual", value: 4 },
-  { label: "Group", value: 3 },
-  { label: "Completed", value: 4 },
-  { label: "Pending", value: 2 },
-  { label: "Revenue", value: "₹41700" },
-];
-
-const couponsData = [
-  {
-    code: "EARLY2024",
-    discount: "20%",
-    type: "Percentage",
-    usage: "45/100",
-    progress: 45,
-    expiry: "2024-03-01",
-    status: "Active",
-  },
-  {
-    code: "STUDENT50",
-    discount: "50%",
-    type: "Percentage",
-    usage: "32/50",
-    progress: 64,
-    expiry: "2024-02-28",
-    status: "Active",
-  },
-  {
-    code: "NEWRUNNER",
-    discount: "15%",
-    type: "Percentage",
-    usage: "156/200",
-    progress: 78,
-    expiry: "2024-04-01",
-    status: "Active",
-  },
-];
 
 function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("users");
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [data, setData] = useState({ users: [], registrations: [], stats: {} });
+
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        // Get the token from localStorage
+        const token = localStorage.getItem("token"); 
+        
+        if (!token) {
+            console.error("No token found! Redirecting to login...");
+            return;
+        }
+
+        const res = await axios.get("http://localhost:8000/api/admin/dashboard-data", {
+          headers: { 
+            // Ensure 'Bearer ' prefix is included
+            Authorization: `Bearer ${token}` 
+          }
+        });
+
+        console.log("Admin Data Received:", res.data); // DEBUG LOG
+
+        if (res.data.success) {
+          setData(res.data);
+        }
+      } catch (err) {
+        console.error("Fetch Error Detail:", err.response?.data || err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchDashboardData();
+  }, []);
+
+  // Filter Logic based on search input
+  const filteredRegistrations = (data.registrations || []).filter((r) => {
+    // 1. Determine the searchable name based on registration type
+    const firstName = r.runnerDetails?.firstName || "";
+    const lastName = r.runnerDetails?.lastName || "";
+    const groupName = r.groupName || "";
+    
+    const searchableName = r.registrationType === 'individual' 
+      ? `${firstName} ${lastName}`.toLowerCase()
+      : groupName.toLowerCase();
+
+    // 2. Safe check with .includes()
+    return searchableName.includes((searchTerm || "").toLowerCase());
+  });
 
   const tabClasses = (tab) =>
     `flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-full text-xs sm:text-sm font-medium transition
-     ${
-       activeTab === tab
-         ? "bg-white text-slate-900 shadow-sm"
-         : "text-slate-500 hover:text-slate-800"
-     }`;
+     ${activeTab === tab ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-800"}`;
 
   const renderStatusBadge = (status) => {
-    let color = "bg-teal-600";
-    if (status === "Inactive") color = "bg-slate-400";
-    if (status === "Pending") color = "bg-amber-500";
-    if (status === "Failed") color = "bg-rose-500";
+    const displayStatus = status === "paid" ? "Paid" : status;
+    let color = "bg-teal-600"; // For 'paid' or 'Verified'
+    if (status === "pending" || status === "Pending Payment") color = "bg-amber-500";
+    if (status === "failed") color = "bg-rose-500";
 
     return (
-      <span
-        className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold text-white ${color}`}
-      >
-        {status}
+      <span className={`inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold uppercase text-white ${color}`}>
+        {displayStatus}
       </span>
     );
   };
 
-  return (
-    <main className="min-h-screen bg-slate-50 pb-16">
-      <div className="max-w-6xl mx-auto px-3 sm:px-4 lg:px-6 pt-8 sm:pt-10">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-teal-700">
-              Admin Dashboard
-            </h1>
-            <p className="mt-2 text-sm sm:text-base text-slate-500">
-              Manage your marathon event with powerful insights
-            </p>
-          </div>
+  if (loading) return (
+    <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 font-sans">
+      <div className="animate-spin rounded-full h-10 w-10 border-t-4 border-teal-700 mb-4"></div>
+      <p className="text-slate-500 font-bold tracking-widest uppercase text-xs">Accessing SSI Database...</p>
+    </div>
+  );
 
-          <button
-            type="button"
-            className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white
-                       px-4 py-2 text-sm font-semibold text-slate-800 hover:bg-slate-100 w-full sm:w-auto"
-          >
-            <FiDownload />
-            Export Data
+  const statsCards = [
+    { label: "Total", value: data.stats.total || 0 },
+    { label: "Individual", value: data.stats.individual || 0 },
+    { label: "Group", value: data.stats.group || 0 },
+    { label: "Paid", value: data.stats.paid || 0 },
+    { label: "Pending", value: data.stats.pending || 0 },
+    { label: "Revenue", value: `₹${Math.round(data.stats.revenue || 0)}` },
+  ];
+
+  return (
+    <main className="min-h-screen bg-slate-50 pb-16 font-sans">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-10">
+        
+        {/* HEADER */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+          <div>
+            <h1 className="text-3xl font-black text-slate-800 tracking-tight">Admin <span className="text-teal-600 underline decoration-teal-200 underline-offset-8">Panel</span></h1>
+            <p className="mt-2 text-slate-400 text-sm font-medium">Sprints Saga India Event Management System</p>
+          </div>
+          <button className="flex items-center justify-center gap-2 rounded-xl bg-slate-800 px-5 py-2.5 text-xs font-bold text-white hover:bg-slate-700 transition shadow-lg">
+            <FiDownload /> DOWNLOAD CSV
           </button>
         </div>
 
-        {/* Tabs */}
-        <div className="mt-6 sm:mt-8 w-full max-w-xl">
-          <div className="bg-slate-50 rounded-full p-1 border border-slate-200 flex flex-wrap gap-2">
-            <button
-              className={tabClasses("users")}
-              onClick={() => setActiveTab("users")}
-            >
-              <FiUsers />
-              <span>Users</span>
-            </button>
-            <button
-              className={tabClasses("registrations")}
-              onClick={() => setActiveTab("registrations")}
-            >
-              <FiUsers className="scale-90" />
-              <span>Registrations</span>
-            </button>
-            <button
-              className={tabClasses("coupons")}
-              onClick={() => setActiveTab("coupons")}
-            >
-              <FiTag />
-              <span>Coupons</span>
-            </button>
+        {/* STATS */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-10">
+          {statsCards.map((card) => (
+            <div key={card.label} className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 transition hover:shadow-md">
+              <p className="text-[10px] uppercase font-black text-slate-300 mb-1 tracking-widest">{card.label}</p>
+              <p className="text-xl font-bold text-slate-800">{card.value}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* CONTROLS */}
+        <div className="flex flex-col md:flex-row gap-4 mb-6">
+          <div className="bg-slate-200/50 rounded-full p-1 flex gap-1 w-full md:w-80 border border-slate-200">
+            <button className={tabClasses("users")} onClick={() => setActiveTab("users")}>Users</button>
+            <button className={tabClasses("registrations")} onClick={() => setActiveTab("registrations")}>Registrations</button>
+          </div>
+          
+          <div className="flex-1 relative">
+            <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+            <input 
+              type="text" 
+              placeholder={`Search by ${activeTab === 'users' ? 'name or email' : 'participant or team name'}...`}
+              className="w-full pl-11 pr-4 py-3 rounded-2xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-teal-500/10 transition bg-white text-sm"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
           </div>
         </div>
 
-        {/* Content */}
-        <div className="mt-8 space-y-8">
-          {/* USERS TAB */}
-          {activeTab === "users" && (
-            <section className="bg-white rounded-3xl border border-slate-200 shadow-sm p-4 sm:p-6 md:p-8">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="h-9 w-9 rounded-full bg-teal-50 text-teal-700 flex items-center justify-center">
-                  <FiUsers />
-                </div>
-                <div>
-                  <h2 className="text-base sm:text-lg font-semibold text-slate-900">
-                    User Management
-                  </h2>
-                  <p className="text-xs sm:text-sm text-slate-500">
-                    View and manage registered users
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex flex-col md:flex-row gap-3 mb-4">
-                <div className="flex-1 relative">
-                  <FiSearch className="absolute left-3 top-2.5 text-slate-400" />
-                  <input
-                    type="text"
-                    placeholder="Search users..."
-                    className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-slate-300
-                               text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
-                  />
-                </div>
-                <button
-                  type="button"
-                  className="inline-flex items-center justify-between gap-2 rounded-xl border
-                             border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 w-full md:w-auto"
-                >
-                  All Status
-                  <span className="text-xs">▾</span>
-                </button>
-              </div>
-
-              <div className="overflow-x-auto">
-                <table className="min-w-full text-xs sm:text-sm">
-                  <thead>
-                    <tr className="text-left text-slate-500 border-b border-slate-200">
-                      <th className="py-3 pr-4">Name</th>
-                      <th className="py-3 pr-4">Email</th>
-                      <th className="py-3 pr-4">Phone</th>
-                      <th className="py-3 pr-4">Age</th>
-                      <th className="py-3 pr-4">Gender</th>
-                      <th className="py-3 pr-4 whitespace-nowrap">
-                        Registration Date
-                      </th>
-                      <th className="py-3 pr-4">Status</th>
+        {/* DATA TABLE */}
+        <div className="bg-white rounded-3xl border border-slate-200 shadow-xl overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="min-w-full text-sm">
+              <thead className="bg-slate-50 border-b border-slate-200">
+                <tr className="text-left text-slate-400 font-bold uppercase text-[10px] tracking-widest">
+                  {activeTab === "users" ? (
+                    <>
+                      <th className="p-5">Account User</th>
+                      <th className="p-5">Email Address</th>
+                      <th className="p-5">Phone</th>
+                      <th className="p-5">Join Date</th>
+                    </>
+                  ) : (
+                    <>
+                      <th className="p-5">Participant / Group</th>
+                      <th className="p-5">Race</th>
+                      <th className="p-5">Status</th>
+                      <th className="p-5">Payment ID</th>
+                      <th className="p-5">T-Shirt</th>
+                    </>
+                  )}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {activeTab === "users" ? (
+                  data.users.filter(u => u.name.toLowerCase().includes(searchTerm.toLowerCase())).map((u) => (
+                    <tr key={u._id} className="hover:bg-slate-50 transition">
+                      <td className="p-5 font-bold text-teal-800">{u.name}</td>
+                      <td className="p-5 text-slate-600">{u.email}</td>
+                      <td className="p-5 text-slate-500 font-mono">{u.phone || "---"}</td>
+                      <td className="p-5 text-slate-400">{new Date(u.createdAt).toLocaleDateString()}</td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    {usersData.map((user) => (
-                      <tr
-                        key={user.email}
-                        className="border-b border-slate-100 last:border-none"
-                      >
-                        <td className="py-3 pr-4 whitespace-nowrap font-medium text-teal-700">
-                          {user.name}
-                        </td>
-                        <td className="py-3 pr-4 whitespace-nowrap text-slate-700">
-                          {user.email}
-                        </td>
-                        <td className="py-3 pr-4 whitespace-nowrap text-slate-700">
-                          {user.phone}
-                        </td>
-                        <td className="py-3 pr-4">{user.age}</td>
-                        <td className="py-3 pr-4">{user.gender}</td>
-                        <td className="py-3 pr-4 whitespace-nowrap">
-                          {user.date}
-                        </td>
-                        <td className="py-3 pr-4">{renderStatusBadge(user.status)}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </section>
-          )}
-
-          {/* REGISTRATIONS TAB */}
-          {activeTab === "registrations" && (
-            <>
-              {/* Stat cards */}
-              <section className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
-                {statsCards.map((card) => (
-                  <div
-                    key={card.label}
-                    className="bg-white rounded-2xl border border-slate-200 shadow-sm px-3 py-3 sm:px-4 sm:py-4"
-                  >
-                    <p className="text-[11px] sm:text-xs text-slate-500 mb-1">
-                      {card.label}
-                    </p>
-                    <p className="text-sm sm:text-lg font-semibold text-slate-900">
-                      {card.value}
-                    </p>
-                  </div>
-                ))}
-              </section>
-
-              {/* Event registrations */}
-              <section className="bg-white rounded-3xl border border-slate-200 shadow-sm p-4 sm:p-6 md:p-8">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="h-9 w-9 rounded-full bg-teal-50 text-teal-700 flex items-center justify-center">
-                    <FiUsers />
-                  </div>
-                  <div>
-                    <h2 className="text-base sm:text-lg font-semibold text-slate-900">
-                      Event Registrations
-                    </h2>
-                    <p className="text-xs sm:text-sm text-slate-500">
-                      View and manage participant registrations
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex flex-col md:flex-row gap-3 mb-4">
-                  <div className="flex-1 relative">
-                    <FiSearch className="absolute left-3 top-2.5 text-slate-400" />
-                    <input
-                      type="text"
-                      placeholder="Search registrations..."
-                      className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-slate-300
-                                 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
-                    />
-                  </div>
-
-                  <button
-                    type="button"
-                    className="inline-flex items-center gap-2 rounded-xl border border-slate-300
-                               bg-white px-3 py-2 text-sm text-slate-700 w-full md:w-auto"
-                  >
-                    <FiFilter />
-                    Individual
-                    <span className="text-xs">▾</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    className="inline-flex items-center gap-2 rounded-xl border border-slate-300
-                               bg-white px-3 py-2 text-sm text-slate-700 w-full md:w-auto"
-                  >
-                    <FiFilter />
-                    All Categories
-                    <span className="text-xs">▾</span>
-                  </button>
-                </div>
-
-                <div className="overflow-x-auto">
-                  <table className="min-w-full text-xs sm:text-sm">
-                    <thead>
-                      <tr className="text-left text-slate-500 border-b border-slate-200">
-                        <th className="py-3 pr-4 whitespace-nowrap">Bib Number</th>
-                        <th className="py-3 pr-4">Name</th>
-                        <th className="py-3 pr-4">Category</th>
-                        <th className="py-3 pr-4 whitespace-nowrap">
-                          Payment Status
-                        </th>
-                        <th className="py-3 pr-4">Amount</th>
-                        <th className="py-3 pr-4 whitespace-nowrap">
-                          Registration Date
-                        </th>
-                        <th className="py-3 pr-4">Accommodation</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {registrationsData.map((r) => (
-                        <tr
-                          key={r.bib}
-                          className="border-b border-slate-100 last:border-none"
-                        >
-                          <td className="py-3 pr-4 text-teal-700 font-semibold">
-                            {r.bib}
-                          </td>
-                          <td className="py-3 pr-4">{r.name}</td>
-                          <td className="py-3 pr-4">
-                            <span className="inline-flex rounded-full border border-slate-300 px-3 py-1 text-[11px] sm:text-xs">
-                              {r.category}
-                            </span>
-                          </td>
-                          <td className="py-3 pr-4">
-                            {renderStatusBadge(r.paymentStatus)}
-                          </td>
-                          <td className="py-3 pr-4">{r.amount}</td>
-                          <td className="py-3 pr-4 whitespace-nowrap">{r.date}</td>
-                          <td className="py-3 pr-4">
-                            <span
-                              className={`inline-flex items-center px-3 py-1 rounded-full text-[11px] sm:text-xs font-semibold ${
-                                r.accommodation === "Yes"
-                                  ? "bg-teal-600 text-white"
-                                  : "bg-slate-200 text-slate-700"
-                              }`}
-                            >
-                              {r.accommodation}
-                            </span>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </section>
-            </>
-          )}
-
-          {/* COUPONS TAB */}
-          {activeTab === "coupons" && (
-            <section className="bg-white rounded-3xl border border-slate-200 shadow-sm p-4 sm:p-6 md:p-8">
-              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
-                <div className="flex items-center gap-3">
-                  <div className="h-9 w-9 rounded-full bg-teal-50 text-teal-700 flex items-center justify-center">
-                    <FiTag />
-                  </div>
-                  <div>
-                    <h2 className="text-base sm:text-lg font-semibold text-slate-900">
-                      Coupon Management
-                    </h2>
-                    <p className="text-xs sm:text-sm text-slate-500">
-                      Create and manage discount coupons
-                    </p>
-                  </div>
-                </div>
-
-                <button
-                  type="button"
-                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-teal-700 px-4 py-2
-                             text-sm font-semibold text-white hover:bg-teal-800 w-full md:w-auto"
-                >
-                  + Create Coupon
-                </button>
-              </div>
-
-              <div className="overflow-x-auto">
-                <table className="min-w-full text-xs sm:text-sm">
-                  <thead>
-                    <tr className="text-left text-slate-500 border-b border-slate-200">
-                      <th className="py-3 pr-4">Code</th>
-                      <th className="py-3 pr-4">Discount</th>
-                      <th className="py-3 pr-4">Type</th>
-                      <th className="py-3 pr-4">Usage</th>
-                      <th className="py-3 pr-4 whitespace-nowrap">Expiry Date</th>
-                      <th className="py-3 pr-4">Status</th>
+                  ))
+                ) : (
+                  filteredRegistrations.map((r) => (
+                    <tr key={r._id} className="hover:bg-slate-50 transition">
+                      <td className="p-5">
+                        <div className="font-bold text-slate-800">
+                           {r.registrationType === 'individual' ? `${r.runnerDetails?.firstName} ${r.runnerDetails?.lastName}` : r.groupName}
+                        </div>
+                        <span className="text-[9px] uppercase font-black text-slate-300 px-1.5 py-0.5 border rounded-md">{r.registrationType}</span>
+                      </td>
+                      <td className="p-5"><span className="bg-teal-50 text-teal-700 px-2.5 py-1 rounded-lg text-[10px] font-bold border border-teal-100 uppercase">{r.raceCategory}</span></td>
+                      <td className="p-5">{renderStatusBadge(r.paymentStatus)}</td>
+                      <td className="p-5 font-mono text-[11px] text-slate-400">{r.paymentDetails?.paymentId || "Pending"}</td>
+                      <td className="p-5 font-bold text-slate-600 uppercase">
+                         {r.registrationType === 'individual' ? r.runnerDetails?.tshirtSize : `${r.groupMembers?.length} Tees`}
+                      </td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    {couponsData.map((c) => (
-                      <tr
-                        key={c.code}
-                        className="border-b border-slate-100 last:border-none"
-                      >
-                        <td className="py-3 pr-4 text-teal-700 font-semibold">
-                          {c.code}
-                        </td>
-                        <td className="py-3 pr-4">{c.discount}</td>
-                        <td className="py-3 pr-4">{c.type}</td>
-                        <td className="py-3 pr-4">
-                          <div className="space-y-1">
-                            <p>{c.usage}</p>
-                            <div className="h-2 rounded-full bg-slate-100 overflow-hidden">
-                              <div
-                                className="h-full bg-teal-600"
-                                style={{ width: `${c.progress}%` }}
-                              />
-                            </div>
-                          </div>
-                        </td>
-                        <td className="py-3 pr-4 whitespace-nowrap">
-                          {c.expiry}
-                        </td>
-                        <td className="py-3 pr-4">
-                          {renderStatusBadge(c.status)}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </section>
-          )}
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </main>
