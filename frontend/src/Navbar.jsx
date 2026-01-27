@@ -1,18 +1,18 @@
-// // 
-
-
-
-// // modified 
+// C:\Users\abhis\OneDrive\Desktop\SOFTWARE_DEVELOPER_LEARNING\marathon_project\frontend\src\Navbar.jsx
 import React, { useState } from "react";
 import { CiMenuBurger } from "react-icons/ci";
 import { AiOutlineClose } from "react-icons/ai";
 import { Link, useLocation } from "react-router-dom";
 import logo from "./assets/logo.jpg";
 import logobg from './assets/logo-Picsart-BackgroundRemover.jpg'
+import { useAuth } from "./AuthProvider";
 
 function Navbar() {
+  const { user } = useAuth(); // Get the user data
   const [open, setOpen] = useState(false);
   const location = useLocation();
+
+  const ADMIN_EMAIL = "admin@sprintssagaindia.com";
 
   const path = location.pathname;
   let activeKey = null;
@@ -36,6 +36,11 @@ function Navbar() {
     // { key: "admin", label: "Admin", to: "/admin" },
   ];
 
+  // Safety Check: Only add Admin if it's the right person
+  if (user?.isLoggedIn && user?.email === ADMIN_EMAIL) {
+    links.push({ key: "admin", label: "Admin", to: "/admin" });
+  }
+
   const toggle = () => setOpen((v) => !v);
   const closeMenu = () => setOpen(false);
 
@@ -48,7 +53,7 @@ function Navbar() {
           {/* Logo */}
           <Link to="/" onClick={closeMenu} className="shrink-0">
             <img
-            // src={logo}
+              // src={logo}
               src={logobg}
               alt="Sprints Saga India"
               className="h-14 w-auto object-contain"
@@ -68,11 +73,10 @@ function Navbar() {
                   <li key={key}>
                     <Link
                       to={to}
-                      className={`px-4 py-2 rounded-full text-sm transition ${
-                        key === activeKey
+                      className={`px-4 py-2 rounded-full text-sm transition ${key === activeKey
                           ? "bg-teal-600 text-white"
                           : "text-slate-700 hover:bg-teal-600 hover:text-white"
-                      }`}
+                        }`}
                     >
                       {label}
                     </Link>
@@ -111,10 +115,11 @@ function Navbar() {
         </div>
       </div>
 
-      {/* Mobile menu */}
-      {/* {open && (
+      {open && (
         <div className="lg:hidden border-t bg-white">
           <ul className="px-4 py-4 space-y-2">
+
+            {/* Navigation links */}
             {links.map(({ key, label, to }) => (
               <li key={key}>
                 <Link
@@ -126,57 +131,37 @@ function Navbar() {
                 </Link>
               </li>
             ))}
+
+            {/* Divider */}
+            <li className="pt-3">
+              <hr />
+            </li>
+
+            {/* ✅ Auth buttons (mobile only) */}
+            <li>
+              <Link
+                to="/signin"
+                onClick={closeMenu}
+                className="block text-center px-4 py-2 rounded-lg border text-slate-700"
+              >
+                Login
+              </Link>
+            </li>
+
+            <li>
+              <Link
+                to="/signup"
+                onClick={closeMenu}
+                className="block text-center px-4 py-2 rounded-lg text-white"
+                style={{ background: "linear-gradient(90deg,#05c6d7,#0c9aa3)" }}
+              >
+                Sign Up
+              </Link>
+            </li>
+
           </ul>
         </div>
-      )} */}
-      {/* Mobile menu */}
-{open && (
-  <div className="lg:hidden border-t bg-white">
-    <ul className="px-4 py-4 space-y-2">
-
-      {/* Navigation links */}
-      {links.map(({ key, label, to }) => (
-        <li key={key}>
-          <Link
-            to={to}
-            onClick={closeMenu}
-            className="block px-3 py-2 rounded-md hover:bg-slate-100"
-          >
-            {label}
-          </Link>
-        </li>
-      ))}
-
-      {/* Divider */}
-      <li className="pt-3">
-        <hr />
-      </li>
-
-      {/* ✅ Auth buttons (mobile only) */}
-      <li>
-        <Link
-          to="/signin"
-          onClick={closeMenu}
-          className="block text-center px-4 py-2 rounded-lg border text-slate-700"
-        >
-          Login 
-        </Link>
-      </li>
-
-      <li>
-        <Link
-          to="/signup"
-          onClick={closeMenu}
-          className="block text-center px-4 py-2 rounded-lg text-white"
-          style={{ background: "linear-gradient(90deg,#05c6d7,#0c9aa3)" }}
-        >
-          Sign Up
-        </Link>
-      </li>
-
-    </ul>
-  </div>
-)}
+      )}
 
     </header>
   );
