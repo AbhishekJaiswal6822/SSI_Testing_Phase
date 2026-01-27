@@ -76,6 +76,7 @@ app.use('/api/register', registrationRoutes);
 // c. Payment (Prefix: /api/payment - Removed the duplicate entry)
 app.use('/api/payment', paymentRoutes); 
 
+app.use('/api/admin', require('./routes/adminRoutes'));
 
 // Basic Route for testing
 app.get('/', (req, res) => {
