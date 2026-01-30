@@ -119,6 +119,9 @@ exports.submitRegistration = async (req, res) => {
         /* ----------------------------------
            GROUP MEMBERS PARSE + NORMALIZE
         ---------------------------------- */
+        /* ----------------------------------
+            GROUP MEMBERS PARSE + NORMALIZE
+        ---------------------------------- */
         let groupMembers = [];
         if (mergedData.registrationType === 'group') {
             try {
@@ -128,16 +131,23 @@ exports.submitRegistration = async (req, res) => {
                     lastName: m.lastName,
                     email: m.email,
                     phone: m.phone,
-                    dob: new Date(m.dob),
+                    dob: m.dob && m.dob !== "N/A" ? new Date(m.dob) : new Date(),
                     gender: m.gender,
                     tshirtSize: m.tshirtSize,
                     nationality: m.nationality,
-                    raceCategory: m.raceCategory || m.raceId
+                    raceCategory: m.raceCategory || m.raceId,
+                    address: m.address || "N/A",
+                    city: m.city || "N/A",
+                    state: m.state || "N/A",
+                    pincode: m.pincode || "N/A",
+                    country: m.country || "N/A",
+                    parentName: m.parentName || "N/A",
+                    parentPhone: m.parentPhone || "N/A"
                 }));
-            } catch {
+            } catch (err) {
                 return res.status(400).json({
                     success: false,
-                    message: 'Invalid group members data'
+                    message: 'Invalid group members data format'
                 });
             }
         }
